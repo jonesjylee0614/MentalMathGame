@@ -47,6 +47,26 @@ export const PlayPage = () => {
   const lastAnswerRef = useRef('');
   const playSound = useFeedbackSound(settings.audio);
 
+  const fireProjectiles = useCallback(
+    (
+      count: number,
+      interval: number,
+      setter: React.Dispatch<React.SetStateAction<number[]>>,
+      lifetime: number
+    ) => {
+      Array.from({ length: count }).forEach((_, index) => {
+        setTimeout(() => {
+          const bulletId = Date.now() + index;
+          setter((prev) => [...prev, bulletId]);
+          setTimeout(() => {
+            setter((prev) => prev.filter((id) => id !== bulletId));
+          }, lifetime);
+        }, index * interval);
+      });
+    },
+    []
+  );
+
   const handleNumberClick = useCallback(
     (num: string) => {
       if (state !== 'playing' || isSubmitting) return;
@@ -135,23 +155,21 @@ export const PlayPage = () => {
         setPlantAttacking(true);
         setShowStars(true);
         
-        // 连续发射3个子弹
-        [0, 1, 2].forEach((i) => {
-          setTimeout(() => {
-            setBullets((prev) => [...prev, Date.now() + i]);
-          }, i * 150); // 每150ms发射一个
-        });
-        
+        // 连续发射子弹
+        fireProjectiles(3, 220, setBullets, 1600);
+
         setTimeout(() => {
           setZombieDamaged(true);
-        }, 350);
-        
+        }, 900);
+
+        setTimeout(() => {
+          setZombieDamaged(false);
+        }, 1300);
+
         setTimeout(() => {
           setPlantAttacking(false);
-          setZombieDamaged(false);
           setShowStars(false);
-          setBullets([]);
-        }, 1200);
+        }, 1700);
       } else {
         setZombieAttacking(true);
 
@@ -167,22 +185,20 @@ export const PlayPage = () => {
           return next.slice(0, 6);
         });
 
-        // 连续发射3个僵尸子弹
-        [0, 1, 2].forEach((i) => {
-          setTimeout(() => {
-            setZombieBullets((prev) => [...prev, Date.now() + i]);
-          }, i * 120); // 每120ms发射一个
-        });
-        
+        // 连续发射僵尸子弹
+        fireProjectiles(3, 200, setZombieBullets, 1500);
+
         setTimeout(() => {
           setPlayerDamaged(true);
-        }, 300);
-        
+        }, 780);
+
+        setTimeout(() => {
+          setPlayerDamaged(false);
+        }, 1180);
+
         setTimeout(() => {
           setZombieAttacking(false);
-          setPlayerDamaged(false);
-          setZombieBullets([]);
-        }, 800);
+        }, 1500);
       }
     });
     const unsubFinish = Game.on('finish', (result) => {
@@ -213,7 +229,7 @@ export const PlayPage = () => {
       unsubFinish();
       Game.reset();
     };
-  }, [level, navigate, playSound, recordResult, setLastResult]);
+  }, [level, navigate, playSound, recordResult, setLastResult, fireProjectiles]);
 
   if (!level) {
     return (
@@ -385,7 +401,8 @@ export const PlayPage = () => {
 
       {/* 主区：题目(左) + 输入区(右) */}
       <main className={styles.stage}>
-        <div className={questionPanelClass}>
+        <div className={styles.questionColumn}>
+          <div className={questionPanelClass}>
           {showStars && <div className={styles.starBurst} aria-hidden="true" />}
           <div className={styles.questionHeader}>
             <span className={styles.questionIndex}>第 {currentQuestion || 1} 题</span>
@@ -431,71 +448,80 @@ export const PlayPage = () => {
               </div>
             </>
           )}
+          </div>
         </div>
 
-        {wrongAnswers.length > 0 && (
-          <aside className={styles.wrongList}>
-            <div className={styles.wrongListHeader}>❌ 错题清单</div>
-            <ul className={styles.wrongListBody}>
-              {wrongAnswers.map((item) => (
-                <li key={item.id} className={styles.wrongListItem}>
-                  <div className={styles.wrongQuestion}>{item.question}</div>
-                  <div className={styles.wrongAnswers}>
-                    <span className={styles.wrongUser}>你的答案：{item.userAnswer}</span>
-                    <span className={styles.wrongCorrect}>正确答案：{item.correctAnswer ?? '未知'}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        )}
-
-        <div className={styles.inputArea}>
-          <div className={`glass-card ${styles.answerPanel}`}>
-            <label className={styles.answerLabel}>你的答案</label>
-            <div className={styles.answerDisplay}>
-              <input
-                value={answer}
-                placeholder="请输入答案"
-                readOnly
-                className={answerInputClass || undefined}
-              />
+        <div className={styles.interactionColumn}>
+          <div className={styles.inputArea}>
+            <div className={`glass-card ${styles.answerPanel}`}>
+              <label className={styles.answerLabel}>你的答案</label>
+              <div className={styles.answerDisplay}>
+                <input
+                  value={answer}
+                  placeholder="请输入答案"
+                  readOnly
+                  className={answerInputClass || undefined}
+                />
+              </div>
             </div>
+            <form className={`glass-card ${styles.keypadPanel}`} onSubmit={onSubmit}>
+              <div className={styles.padGrid}>
+                {keypadButtons.map(({ key, label, onPress, type = 'button', variant, span }) => {
+                  const variantClass =
+                    variant === 'action' ? styles.padAction : variant === 'submit' ? styles.padSubmit : '';
+                  const spanClass = span === 'wide' ? styles.padWide : '';
+                  const classes = [styles.padButton, variantClass, spanClass].filter(Boolean).join(' ');
+
+                  return (
+                    <button
+                      key={key}
+                      type={type}
+                      onClick={(evt) => {
+                        evt.preventDefault(); // 阻止所有按钮的默认行为
+                        evt.stopPropagation(); // 阻止事件冒泡
+                        if (type === 'submit') {
+                          // 提交按钮：检查答案和状态
+                          if (!answer.trim() || state !== 'playing' || isSubmitting) return;
+                        } else {
+                          // 数字/操作按钮：如果正在提交中则禁止输入
+                          if (isSubmitting) return;
+                        }
+                        onPress();
+                      }}
+                      disabled={type === 'submit' && (!answer.trim() || state !== 'playing' || isSubmitting)}
+                      className={classes}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </form>
           </div>
 
-          <form className={`glass-card ${styles.keypadPanel}`} onSubmit={onSubmit}>
-            <div className={styles.padGrid}>
-              {keypadButtons.map(({ key, label, onPress, type = 'button', variant, span }) => {
-                const variantClass =
-                  variant === 'action' ? styles.padAction : variant === 'submit' ? styles.padSubmit : '';
-                const spanClass = span === 'wide' ? styles.padWide : '';
-                const classes = [styles.padButton, variantClass, spanClass].filter(Boolean).join(' ');
-
-                return (
-                  <button
-                    key={key}
-                    type={type}
-                    onClick={(evt) => {
-                      evt.preventDefault(); // 阻止所有按钮的默认行为
-                      evt.stopPropagation(); // 阻止事件冒泡
-                      if (type === 'submit') {
-                        // 提交按钮：检查答案和状态
-                        if (!answer.trim() || state !== 'playing' || isSubmitting) return;
-                      } else {
-                        // 数字/操作按钮：如果正在提交中则禁止输入
-                        if (isSubmitting) return;
-                      }
-                      onPress();
-                    }}
-                    disabled={type === 'submit' && (!answer.trim() || state !== 'playing' || isSubmitting)}
-                    className={classes}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          </form>
+          {wrongAnswers.length > 0 && (
+            <aside className={`glass-card ${styles.wrongList}`}>
+              <div className={styles.wrongListHeader}>❌ 错题清单</div>
+              <ul className={styles.wrongListBody}>
+                {wrongAnswers.map((item) => (
+                  <li key={item.id} className={styles.wrongListItem}>
+                    <span className={styles.wrongQuestion} title={item.question}>
+                      {item.question}
+                    </span>
+                    <span className={styles.wrongUser} title={`你的答案：${item.userAnswer}`}>
+                      你的：{item.userAnswer}
+                    </span>
+                    <span
+                      className={styles.wrongCorrect}
+                      title={`正确答案：${item.correctAnswer ?? '未知'}`}
+                    >
+                      正确：{item.correctAnswer ?? '未知'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
         </div>
       </main>
 
