@@ -55,7 +55,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
       <main className={styles.main}>
         <div className={styles.topBar}>
           <button className={styles.homeButton} onClick={() => navigate('/')}>
-            🏠 首页
+            🏠 首页 · Mental Math Arena
           </button>
           <div className={styles.topBarRight}>
             <div className={styles.userInfo}>
@@ -104,10 +104,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
           </>
         )}
 
-        <header className={styles.header}>
-          <h1 className={styles.title}>Mental Math Arena</h1>
-          <p className={styles.subtitle}>{subtitle}</p>
-        </header>
         <div className={styles.content}>{children}</div>
         <nav className={styles.mobileNav}>
           {links.map((link) => (
