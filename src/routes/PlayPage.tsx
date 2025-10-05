@@ -39,6 +39,8 @@ export const PlayPage = () => {
   const [encouragingMsg, setEncouragingMsg] = useState('');
   const [showBullet, setShowBullet] = useState(false);
   const [showZombieBullet, setShowZombieBullet] = useState(false);
+  const [bullets, setBullets] = useState<number[]>([]); // 多个子弹
+  const [zombieBullets, setZombieBullets] = useState<number[]>([]); // 多个僵尸子弹
   const [isSubmitting, setIsSubmitting] = useState(false);
   const playSound = useFeedbackSound(settings.audio);
 
@@ -127,27 +129,43 @@ export const PlayPage = () => {
         setEncouragingMsg(randomMsg);
         setPlantAttacking(true);
         setShowStars(true);
-        setShowBullet(true);
+        
+        // 连续发射3个子弹
+        [0, 1, 2].forEach((i) => {
+          setTimeout(() => {
+            setBullets((prev) => [...prev, Date.now() + i]);
+          }, i * 150); // 每150ms发射一个
+        });
+        
         setTimeout(() => {
           setZombieDamaged(true);
-        }, 260);
+        }, 350);
+        
         setTimeout(() => {
           setPlantAttacking(false);
           setZombieDamaged(false);
           setShowStars(false);
-          setShowBullet(false);
-        }, 1000);
+          setBullets([]);
+        }, 1200);
       } else {
         setZombieAttacking(true);
-        setShowZombieBullet(true);
+        
+        // 连续发射3个僵尸子弹
+        [0, 1, 2].forEach((i) => {
+          setTimeout(() => {
+            setZombieBullets((prev) => [...prev, Date.now() + i]);
+          }, i * 120); // 每120ms发射一个
+        });
+        
         setTimeout(() => {
           setPlayerDamaged(true);
         }, 300);
+        
         setTimeout(() => {
           setZombieAttacking(false);
           setPlayerDamaged(false);
-          setShowZombieBullet(false);
-        }, 600);
+          setZombieBullets([]);
+        }, 800);
       }
     });
     const unsubFinish = Game.on('finish', (result) => {
@@ -298,11 +316,15 @@ export const PlayPage = () => {
               </div>
               <span className={styles.hpLabel}>{playerHpPercent}%</span>
             </div>
-            <span className={`${styles.characterIcon} ${plantAttacking ? styles.attacking : ''}`}>🌟</span>
+            <span className={`${styles.characterIcon} ${plantAttacking ? styles.attacking : ''}`}>🌻</span>
           </div>
 
-          {showBullet && <div className={styles.bullet}>💥</div>}
-          {showZombieBullet && <div className={styles.zombieBullet}>💢</div>}
+          {bullets.map((id) => (
+            <div key={id} className={styles.bullet}>💥</div>
+          ))}
+          {zombieBullets.map((id) => (
+            <div key={id} className={styles.zombieBullet}>💢</div>
+          ))}
 
           {snapshot && snapshot.combo > 0 && (
             <div className={styles.comboBadge}>
@@ -320,7 +342,7 @@ export const PlayPage = () => {
               </div>
               <span className={styles.hpLabel}>{monsterHpPercent}%</span>
             </div>
-            <span className={`${styles.characterIcon} ${zombieAttacking ? styles.attacking : ''}`}>👹</span>
+            <span className={`${styles.characterIcon} ${zombieAttacking ? styles.attacking : ''}`}>🧟</span>
           </div>
         </div>
       </section>
@@ -347,9 +369,24 @@ export const PlayPage = () => {
                   : settings.shake
                   ? styles.feedbackNegative
                   : styles.feedbackNeutral
-              } ${styles.feedbackToast}`}
+              } ${styles.feedbackToast} ${styles.feedbackLarge}`}
             >
-              {feedback.correct ? encouragingMsg : `❌ 正确答案：${feedback.expected}`}
+              <div className={styles.feedbackIcon}>
+                {feedback.correct ? '✅' : '❌'}
+              </div>
+              <div className={styles.feedbackText}>
+                {feedback.correct ? (
+                  <>
+                    <div className={styles.feedbackTitle}>答对了！</div>
+                    <div className={styles.feedbackMsg}>{encouragingMsg}</div>
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.feedbackTitle}>答错了</div>
+                    <div className={styles.feedbackMsg}>正确答案：{feedback.expected}</div>
+                  </>
+                )}
+              </div>
             </div>
           )}
         </div>
