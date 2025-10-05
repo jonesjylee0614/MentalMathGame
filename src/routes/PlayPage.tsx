@@ -225,19 +225,19 @@ export const PlayPage = () => {
   const keypadButtons: Array<
     | { key: string; label: string; onPress: () => void; type?: 'button' | 'submit'; variant?: 'action' | 'submit'; span?: 'wide'; }
   > = [
-    { key: '7', label: '7', onPress: () => handleNumberClick('7') },
-    { key: '8', label: '8', onPress: () => handleNumberClick('8') },
-    { key: '9', label: '9', onPress: () => handleNumberClick('9') },
-    { key: 'del', label: '⌫', onPress: handleDelete, variant: 'action' },
-    { key: '4', label: '4', onPress: () => handleNumberClick('4') },
-    { key: '5', label: '5', onPress: () => handleNumberClick('5') },
-    { key: '6', label: '6', onPress: () => handleNumberClick('6') },
-    { key: 'clear', label: 'C', onPress: handleClear, variant: 'action' },
-    { key: '1', label: '1', onPress: () => handleNumberClick('1') },
-    { key: '2', label: '2', onPress: () => handleNumberClick('2') },
-    { key: '3', label: '3', onPress: () => handleNumberClick('3') },
-    { key: 'minus', label: '−', onPress: () => handleNumberClick('-'), variant: 'action' },
-    { key: '0', label: '0', onPress: () => handleNumberClick('0'), span: 'wide' },
+    { key: '7', label: '7', onPress: () => handleNumberClick('7'), type: 'button' },
+    { key: '8', label: '8', onPress: () => handleNumberClick('8'), type: 'button' },
+    { key: '9', label: '9', onPress: () => handleNumberClick('9'), type: 'button' },
+    { key: 'del', label: '⌫', onPress: handleDelete, variant: 'action', type: 'button' },
+    { key: '4', label: '4', onPress: () => handleNumberClick('4'), type: 'button' },
+    { key: '5', label: '5', onPress: () => handleNumberClick('5'), type: 'button' },
+    { key: '6', label: '6', onPress: () => handleNumberClick('6'), type: 'button' },
+    { key: 'clear', label: 'C', onPress: handleClear, variant: 'action', type: 'button' },
+    { key: '1', label: '1', onPress: () => handleNumberClick('1'), type: 'button' },
+    { key: '2', label: '2', onPress: () => handleNumberClick('2'), type: 'button' },
+    { key: '3', label: '3', onPress: () => handleNumberClick('3'), type: 'button' },
+    { key: 'minus', label: '−', onPress: () => handleNumberClick('-'), variant: 'action', type: 'button' },
+    { key: '0', label: '0', onPress: () => handleNumberClick('0'), span: 'wide', type: 'button' },
     {
       key: 'submit',
       label: '✓ 提交',
@@ -296,7 +296,7 @@ export const PlayPage = () => {
               </div>
               <span className={styles.hpLabel}>{playerHpPercent}%</span>
             </div>
-            <span className={`${styles.characterIcon} ${plantAttacking ? styles.attacking : ''}`}>🌻</span>
+            <span className={`${styles.characterIcon} ${plantAttacking ? styles.attacking : ''}`}>🌟</span>
           </div>
 
           {showBullet && <div className={styles.bullet}>💥</div>}
