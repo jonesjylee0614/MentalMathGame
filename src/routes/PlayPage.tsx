@@ -190,6 +190,8 @@ export const PlayPage = () => {
 
   const onSubmit = (evt: FormEvent) => {
     evt.preventDefault();
+    // 只有有答案且游戏进行中且未提交时才处理
+    if (!answer.trim() || state !== 'playing' || isSubmitting) return;
     handleSubmit();
   };
 
@@ -379,6 +381,7 @@ export const PlayPage = () => {
                     type={type}
                     onClick={(evt) => {
                       evt.preventDefault(); // 阻止所有按钮的默认行为
+                      evt.stopPropagation(); // 阻止事件冒泡
                       if (type === 'submit') {
                         // 提交按钮：检查答案和状态
                         if (!answer.trim() || state !== 'playing' || isSubmitting) return;
