@@ -54,7 +54,7 @@ export const PlayPage = () => {
     const unsubFeedback = Game.on('feedback', (fb) => {
       setFeedback(fb);
       playSound(fb.correct ? 'success' : 'error');
-      
+
       // Trigger animations
       if (fb.correct) {
         const randomMsg = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];

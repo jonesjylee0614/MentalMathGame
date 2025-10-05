@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 const createOscillator = (context: AudioContext, frequency: number, duration = 0.25) => {
   const oscillator = context.createOscillator();
@@ -28,7 +28,7 @@ export const useFeedbackSound = (enabled: boolean) => {
     };
   }, [context]);
 
-  const play = (type: 'success' | 'error') => {
+  const play = useCallback((type: 'success' | 'error') => {
     if (!enabled || !context) return;
     if (context.state === 'suspended') {
       context.resume().catch(() => undefined);
@@ -40,7 +40,7 @@ export const useFeedbackSound = (enabled: boolean) => {
     } else {
       setTimeout(() => createOscillator(context, base * 0.75, 0.2), 80);
     }
-  };
+  }, [enabled, context]);
 
   return play;
 };

@@ -155,6 +155,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     []
   );
 
+  const setLastResult = useCallback((res: GameResult | null) => {
+    setLastResultState(res);
+    if (!isBrowser()) return;
+    if (res) {
+      window.sessionStorage.setItem(LAST_RESULT_KEY, JSON.stringify(res));
+    } else {
+      window.sessionStorage.removeItem(LAST_RESULT_KEY);
+    }
+  }, []);
+
   const value = useMemo<GameContextValue>(
     () => ({
       profile,
@@ -167,15 +177,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateSettings,
       recordResult,
       refresh,
-      setLastResult: (res) => {
-        setLastResultState(res);
-        if (!isBrowser()) return;
-        if (res) {
-          window.sessionStorage.setItem(LAST_RESULT_KEY, JSON.stringify(res));
-        } else {
-          window.sessionStorage.removeItem(LAST_RESULT_KEY);
-        }
-      }
+      setLastResult
     }),
     [achievements, lastResult, profile, progress, recordResult, refresh, settings, stats, updateSettings]
   );
