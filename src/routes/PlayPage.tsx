@@ -42,6 +42,7 @@ export const PlayPage = () => {
   const [bullets, setBullets] = useState<number[]>([]); // 多个子弹
   const [zombieBullets, setZombieBullets] = useState<number[]>([]); // 多个僵尸子弹
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorListOpen, setErrorListOpen] = useState(false);
   const playSound = useFeedbackSound(settings.audio);
 
   const handleNumberClick = useCallback(
@@ -130,42 +131,42 @@ export const PlayPage = () => {
         setPlantAttacking(true);
         setShowStars(true);
         
-        // 连续发射3个子弹
-        [0, 1, 2].forEach((i) => {
+        // 连续发射5个子弹，慢慢飞
+        [0, 1, 2, 3, 4].forEach((i) => {
           setTimeout(() => {
             setBullets((prev) => [...prev, Date.now() + i]);
-          }, i * 150); // 每150ms发射一个
+          }, i * 200); // 每200ms发射一个
         });
         
         setTimeout(() => {
           setZombieDamaged(true);
-        }, 350);
+        }, 600);
         
         setTimeout(() => {
           setPlantAttacking(false);
           setZombieDamaged(false);
           setShowStars(false);
           setBullets([]);
-        }, 1200);
+        }, 2000);
       } else {
         setZombieAttacking(true);
         
-        // 连续发射3个僵尸子弹
-        [0, 1, 2].forEach((i) => {
+        // 连续发射4个僵尸子弹
+        [0, 1, 2, 3].forEach((i) => {
           setTimeout(() => {
             setZombieBullets((prev) => [...prev, Date.now() + i]);
-          }, i * 120); // 每120ms发射一个
+          }, i * 180); // 每180ms发射一个
         });
         
         setTimeout(() => {
           setPlayerDamaged(true);
-        }, 300);
+        }, 500);
         
         setTimeout(() => {
           setZombieAttacking(false);
           setPlayerDamaged(false);
           setZombieBullets([]);
-        }, 800);
+        }, 1200);
       }
     });
     const unsubFinish = Game.on('finish', (result) => {
@@ -278,8 +279,74 @@ export const PlayPage = () => {
     return `还有 ${remaining} 题，继续战斗！`;
   }, [answeredQuestions, totalQuestions, snapshot, monsterHpPercent, playerHpPercent]);
 
+  const wrongAnswers = snapshot?.history.filter(h => !h.correct) || [];
+
   return (
     <div className={`fade-in ${styles.wrapper}`}>
+      {/* 错误题目清单 */}
+      {state === 'playing' && (
+        <div className={styles.errorPanel}>
+          {!errorListOpen && (
+            <button
+              className={`${styles.errorToggle} ${wrongAnswers.length > 0 ? styles.hasErrors : ''}`}
+              onClick={() => setErrorListOpen(true)}
+              aria-label="查看错误题目"
+            >
+              ❌ 错题 {wrongAnswers.length > 0 && `(${wrongAnswers.length})`}
+            </button>
+          )}
+          {errorListOpen && (
+            <div className={styles.errorList}>
+              <div className={styles.errorListHeader}>
+                <span className={styles.errorListTitle}>❌ 错题清单</span>
+                <span className={styles.errorCount}>{wrongAnswers.length}</span>
+                <button
+                  onClick={() => setErrorListOpen(false)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    padding: '0 4px',
+                    color: '#991b1b',
+                  }}
+                  aria-label="关闭"
+                >
+                  ×
+                </button>
+              </div>
+              {wrongAnswers.length === 0 ? (
+                <div className={styles.emptyMessage}>
+                  🎉 太棒了！<br />还没有错题
+                </div>
+              ) : (
+                <div className={styles.errorItems}>
+                  {wrongAnswers.map((item, idx) => {
+                    const q = snapshot?.level && question ? 
+                      (Game as any).questions?.find((qu: Question) => qu.id === item.id) || null : null;
+                    return (
+                      <div key={`${item.id}-${idx}`} className={styles.errorItem}>
+                        <div className={styles.errorQuestionText}>
+                          {q?.text || '题目'}
+                        </div>
+                        <div className={styles.errorAnswerRow}>
+                          <div className={styles.yourAnswerWrong}>
+                            你的答案：{item.answer || '空'}
+                          </div>
+                          <div className={styles.correctAnswerShow}>
+                            ✓ 正确答案：{item.expected}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* 顶部状态区：关卡名 + 进度 + 倒计时 */}
       <header className={`glass-card ${styles.topBar}`}>
         <div className={styles.levelInfo}>

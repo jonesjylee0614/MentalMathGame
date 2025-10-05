@@ -40,7 +40,7 @@ const normalizeInput = (answer: string, question: Question) => {
 export class GameEngine {
   private level: Level | null = null;
   private state: GameState = 'idle';
-  private questions: Question[] = [];
+  public questions: Question[] = [];
   private current = 0;
   private correct = 0;
   private combo = 0;

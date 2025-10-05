@@ -196,7 +196,7 @@
   left: 8%;
   top: 50%;
   font-size: clamp(2rem, 4vw, 3rem);
-  animation: bulletFly 0.6s linear forwards;
+  animation: bulletFly 1.2s ease-out forwards;
   z-index: 50;
   pointer-events: none;
   filter: drop-shadow(0 0 10px rgba(34, 197, 94, 1)) 
@@ -209,7 +209,7 @@
   right: 8%;
   top: 50%;
   font-size: clamp(2rem, 4vw, 3rem);
-  animation: zombieBulletFly 0.6s linear forwards;
+  animation: zombieBulletFly 1s ease-out forwards;
   z-index: 50;
   pointer-events: none;
   filter: drop-shadow(0 0 10px rgba(234, 88, 12, 1)) 
@@ -220,7 +220,7 @@
 .comboBadge {
   position: absolute;
   top: 50%;
-  right: 15%; /* 靠近右侧（被攻击方） */
+  right: 25%; /* 更靠右，不遮挡僵尸 */
   transform: translateY(-50%);
   padding: 10px 20px;
   border-radius: 16px;
@@ -325,8 +325,8 @@
 }
 
 .overlayWrong {
-  background: radial-gradient(circle, rgba(239, 68, 68, 0.7) 0%, rgba(239, 68, 68, 0) 70%);
-  animation: overlayFlash 0.5s ease, screenShake 0.5s ease;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.85) 0%, rgba(239, 68, 68, 0.3) 50%, rgba(239, 68, 68, 0) 70%);
+  animation: overlayFlash 0.6s ease, screenShake 0.6s ease;
 }
 
 @keyframes overlayFade {
@@ -336,13 +336,23 @@
 
 @keyframes overlayFlash {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  20% { opacity: 0.3; }
+  40% { opacity: 1; }
+  60% { opacity: 0.3; }
+  80% { opacity: 1; }
 }
 
 @keyframes screenShake {
   0%, 100% { transform: translate(0, 0); }
-  10%, 30%, 50%, 70%, 90% { transform: translate(-10px, 5px); }
-  20%, 40%, 60%, 80% { transform: translate(10px, -5px); }
+  10% { transform: translate(-15px, 8px); }
+  20% { transform: translate(15px, -8px); }
+  30% { transform: translate(-12px, 6px); }
+  40% { transform: translate(12px, -6px); }
+  50% { transform: translate(-10px, 5px); }
+  60% { transform: translate(10px, -5px); }
+  70% { transform: translate(-8px, 4px); }
+  80% { transform: translate(8px, -4px); }
+  90% { transform: translate(-5px, 2px); }
 }
 
 .starBurst {
@@ -556,11 +566,12 @@
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #ffffff;
   border-color: #fca5a5;
-  box-shadow: 0 20px 60px rgba(239, 68, 68, 0.6), 
-              0 0 0 8px rgba(239, 68, 68, 0.3),
+  box-shadow: 0 20px 60px rgba(239, 68, 68, 0.8), 
+              0 0 0 12px rgba(239, 68, 68, 0.4),
+              0 0 0 24px rgba(239, 68, 68, 0.2),
               inset 0 -4px 0 rgba(0, 0, 0, 0.2);
-  animation: feedbackShake 0.5s ease, 
-             pulse 1.5s ease infinite;
+  animation: feedbackShake 0.6s ease, 
+             wrongPulse 1.5s ease infinite;
 }
 
 .feedbackNeutral {
@@ -717,46 +728,86 @@
 @keyframes bulletFly {
   0% {
     left: 8%;
-    opacity: 1;
-    transform: translateY(-50%) scale(0.6);
+    opacity: 0;
+    transform: translateY(-50%) scale(0.3);
   }
-  10% {
-    left: 15%;
+  5% {
+    left: 10%;
     opacity: 1;
-    transform: translateY(-50%) scale(0.8);
+    transform: translateY(-50%) scale(0.7);
   }
-  85% {
-    left: 88%;
+  15% {
+    left: 20%;
     opacity: 1;
-    transform: translateY(-50%) scale(1);
+    transform: translateY(-50%) scale(0.8) rotate(10deg);
+  }
+  30% {
+    left: 35%;
+    opacity: 1;
+    transform: translateY(-50%) scale(0.9) rotate(-5deg);
+  }
+  50% {
+    left: 55%;
+    opacity: 1;
+    transform: translateY(-50%) scale(1) rotate(5deg);
+  }
+  70% {
+    left: 75%;
+    opacity: 1;
+    transform: translateY(-50%) scale(1.05) rotate(-3deg);
+  }
+  90% {
+    left: 90%;
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1);
   }
   100% {
     left: 92%;
     opacity: 0;
-    transform: translateY(-50%) scale(1.3);
+    transform: translateY(-50%) scale(1.5);
   }
 }
 
 @keyframes zombieBulletFly {
   0% {
     right: 8%;
-    opacity: 1;
-    transform: translateY(-50%) scale(0.6) scaleX(-1);
+    opacity: 0;
+    transform: translateY(-50%) scale(0.3) scaleX(-1);
   }
-  10% {
-    right: 15%;
+  5% {
+    right: 10%;
     opacity: 1;
-    transform: translateY(-50%) scale(0.8) scaleX(-1);
+    transform: translateY(-50%) scale(0.7) scaleX(-1);
   }
-  85% {
-    right: 88%;
+  15% {
+    right: 20%;
     opacity: 1;
-    transform: translateY(-50%) scale(1) scaleX(-1);
+    transform: translateY(-50%) scale(0.8) scaleX(-1) rotate(-10deg);
+  }
+  30% {
+    right: 35%;
+    opacity: 1;
+    transform: translateY(-50%) scale(0.9) scaleX(-1) rotate(5deg);
+  }
+  50% {
+    right: 55%;
+    opacity: 1;
+    transform: translateY(-50%) scale(1) scaleX(-1) rotate(-5deg);
+  }
+  70% {
+    right: 75%;
+    opacity: 1;
+    transform: translateY(-50%) scale(1.05) scaleX(-1) rotate(3deg);
+  }
+  90% {
+    right: 90%;
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1) scaleX(-1);
   }
   100% {
     right: 92%;
     opacity: 0;
-    transform: translateY(-50%) scale(1.3) scaleX(-1);
+    transform: translateY(-50%) scale(1.5) scaleX(-1);
   }
 }
 
@@ -865,13 +916,49 @@
 
 @keyframes feedbackShake {
   0%, 100% {
-    transform: translate(-50%, -50%) rotate(0deg);
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
   }
-  10%, 30%, 50%, 70%, 90% {
-    transform: translate(calc(-50% - 15px), -50%) rotate(-5deg);
+  10% {
+    transform: translate(calc(-50% - 20px), -50%) rotate(-8deg) scale(1.05);
   }
-  20%, 40%, 60%, 80% {
-    transform: translate(calc(-50% + 15px), -50%) rotate(5deg);
+  20% {
+    transform: translate(calc(-50% + 20px), -50%) rotate(8deg) scale(1.05);
+  }
+  30% {
+    transform: translate(calc(-50% - 15px), -50%) rotate(-6deg) scale(1.03);
+  }
+  40% {
+    transform: translate(calc(-50% + 15px), -50%) rotate(6deg) scale(1.03);
+  }
+  50% {
+    transform: translate(calc(-50% - 10px), -50%) rotate(-4deg) scale(1.02);
+  }
+  60% {
+    transform: translate(calc(-50% + 10px), -50%) rotate(4deg) scale(1.02);
+  }
+  70% {
+    transform: translate(calc(-50% - 5px), -50%) rotate(-2deg) scale(1.01);
+  }
+  80% {
+    transform: translate(calc(-50% + 5px), -50%) rotate(2deg) scale(1.01);
+  }
+  90% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes wrongPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 20px 60px rgba(239, 68, 68, 0.8), 
+                0 0 0 12px rgba(239, 68, 68, 0.4),
+                0 0 0 24px rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.08);
+    box-shadow: 0 25px 80px rgba(239, 68, 68, 1), 
+                0 0 0 16px rgba(239, 68, 68, 0.6),
+                0 0 0 32px rgba(239, 68, 68, 0.3);
   }
 }
 
@@ -1033,5 +1120,213 @@
 
   .bottomStats div {
     padding: 6px 10px;
+  }
+}
+
+/* 错误题目清单面板 */
+.errorPanel {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.errorToggle {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  padding: 12px 8px;
+  border-radius: 12px 0 0 12px;
+  cursor: pointer;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 800;
+  box-shadow: -4px 4px 16px rgba(239, 68, 68, 0.4);
+  transition: all 0.3s ease;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.errorToggle:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: -6px 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+.errorToggle.hasErrors {
+  animation: errorPulse 2s ease-in-out infinite;
+}
+
+.errorList {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(254, 226, 226, 0.95));
+  border: 3px solid rgba(239, 68, 68, 0.5);
+  border-radius: 16px 0 0 16px;
+  padding: 16px;
+  max-width: 320px;
+  max-height: 60vh;
+  overflow-y: auto;
+  box-shadow: -8px 8px 32px rgba(239, 68, 68, 0.3);
+  transform-origin: right center;
+  animation: slideInFromRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.errorList.collapsed {
+  display: none;
+}
+
+.errorListHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.errorListTitle {
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  font-weight: 900;
+  color: #991b1b;
+  flex: 1;
+}
+
+.errorCount {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  font-weight: 800;
+}
+
+.errorItems {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.errorItem {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  padding: 12px;
+  animation: errorItemSlideIn 0.3s ease;
+}
+
+.errorItem:nth-child(odd) {
+  animation-delay: 0.05s;
+}
+
+.errorItem:nth-child(even) {
+  animation-delay: 0.1s;
+}
+
+.errorQuestionText {
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  font-weight: 800;
+  color: #7c2d12;
+  margin-bottom: 8px;
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+.errorAnswerRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+}
+
+.yourAnswerWrong {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.correctAnswerShow {
+  color: #059669;
+  font-weight: 900;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+}
+
+.emptyMessage {
+  text-align: center;
+  padding: 32px 16px;
+  color: #6b7280;
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  font-style: italic;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes errorItemSlideIn {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes errorPulse {
+  0%, 100% {
+    box-shadow: -4px 4px 16px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: -6px 6px 24px rgba(239, 68, 68, 0.7), 0 0 0 4px rgba(239, 68, 68, 0.2);
+  }
+}
+
+/* 响应式调整 */
+@media (max-width: 960px) {
+  .errorPanel {
+    right: 12px;
+  }
+  
+  .errorList {
+    max-width: 280px;
+    max-height: 50vh;
+  }
+}
+
+@media (max-width: 640px) {
+  .errorPanel {
+    top: auto;
+    bottom: 80px;
+    right: 12px;
+    transform: none;
+  }
+  
+  .errorToggle {
+    writing-mode: horizontal-tb;
+    border-radius: 12px 12px 0 0;
+    padding: 8px 12px;
+    min-height: auto;
+    min-width: 100px;
+  }
+  
+  .errorList {
+    position: fixed;
+    bottom: 80px;
+    right: 12px;
+    max-width: calc(100vw - 24px);
+    max-height: 40vh;
+    border-radius: 12px 12px 0 0;
   }
 }
