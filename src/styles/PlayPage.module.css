@@ -125,6 +125,8 @@
   align-items: center;
   gap: clamp(8px, 1.2vh, 12px);
   flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .characterHpTop {
@@ -143,6 +145,7 @@
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
   position: relative;
+  z-index: 1;
 }
 
 .characterIcon.attacking {
@@ -236,7 +239,7 @@
   font-size: clamp(1.1rem, 2vw, 1.4rem);
   box-shadow: 0 8px 24px rgba(249, 115, 22, 0.5);
   animation: comboFloat 1.2s ease-in-out infinite;
-  z-index: 15;
+  z-index: 50;
   pointer-events: none;
 }
 
