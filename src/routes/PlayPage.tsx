@@ -384,8 +384,11 @@ export const PlayPage = () => {
                     </>
                   ) : (
                     <>
-                      <div className={styles.feedbackTitle}>答错了！！！</div>
-                      <div className={styles.feedbackMsg}>正确答案是：{feedback.expected}</div>
+                      <div className={styles.feedbackTitle}>❌ 错了 ❌</div>
+                      <div className={styles.feedbackMsg}>
+                        <div className={styles.wrongAnswer}>你答的是：{answer || '空'}</div>
+                        <div className={styles.correctAnswer}>正确答案：{feedback.expected}</div>
+                      </div>
                     </>
                   )}
                 </div>

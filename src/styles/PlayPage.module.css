@@ -323,8 +323,8 @@
 }
 
 .overlayWrong {
-  background: radial-gradient(circle, rgba(239, 68, 68, 0.5) 0%, rgba(239, 68, 68, 0) 70%);
-  animation: overlayFlash 0.5s ease;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.7) 0%, rgba(239, 68, 68, 0) 70%);
+  animation: overlayFlash 0.5s ease, screenShake 0.5s ease;
 }
 
 @keyframes overlayFade {
@@ -333,8 +333,14 @@
 }
 
 @keyframes overlayFlash {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 0.3; }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes screenShake {
+  0%, 100% { transform: translate(0, 0); }
+  10%, 30%, 50%, 70%, 90% { transform: translate(-10px, 5px); }
+  20%, 40%, 60%, 80% { transform: translate(10px, -5px); }
 }
 
 .starBurst {
@@ -498,6 +504,39 @@
   font-weight: 700;
   opacity: 1;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wrongAnswer {
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  text-decoration: line-through;
+  opacity: 0.9;
+}
+
+.correctAnswer {
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  animation: correctAnswerPulse 0.8s ease infinite;
+}
+
+@keyframes correctAnswerPulse {
+  0%, 100% {
+    transform: scale(1);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+  50% {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 1);
+  }
 }
 
 .feedbackPositive {
