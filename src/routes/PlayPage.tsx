@@ -40,6 +40,28 @@ export const PlayPage = () => {
   const [encouragingMsg, setEncouragingMsg] = useState('');
   const playSound = useFeedbackSound(settings.audio);
 
+  const handleNumberClick = useCallback(
+    (num: string) => {
+      if (state !== 'playing') return;
+      setAnswer((prev) => prev + num);
+    },
+    [state]
+  );
+
+  const handleDelete = useCallback(() => {
+    setAnswer((prev) => prev.slice(0, -1));
+  }, []);
+
+  const handleClear = useCallback(() => {
+    setAnswer('');
+  }, []);
+
+  const handleSubmit = useCallback(() => {
+    if (!answer.trim() || state !== 'playing') return;
+    Game.submit(answer);
+    setFeedback(null);
+  }, [answer, state]);
+
   useEffect(() => {
     if (!level) {
       setError('未找到关卡，返回关卡列表');
@@ -142,7 +164,7 @@ export const PlayPage = () => {
       unsubFinish();
       Game.reset();
     };
-  }, [level, navigate, playSound, recordResult, setLastResult, state, answer, handleNumberClick, handleSubmit, handleDelete, handleClear]);
+  }, [level, navigate, playSound, recordResult, setLastResult, handleNumberClick, handleSubmit, handleDelete, handleClear]);
 
   if (!level) {
     return (
@@ -157,29 +179,8 @@ export const PlayPage = () => {
 
   const onSubmit = (evt: FormEvent) => {
     evt.preventDefault();
-    if (!answer.trim() || state !== 'playing') return;
-    Game.submit(answer);
-    setFeedback(null);
+    handleSubmit();
   };
-
-  const handleNumberClick = useCallback((num: string) => {
-    if (state !== 'playing') return;
-    setAnswer((prev) => prev + num);
-  }, [state]);
-
-  const handleDelete = useCallback(() => {
-    setAnswer((prev) => prev.slice(0, -1));
-  }, []);
-
-  const handleClear = useCallback(() => {
-    setAnswer('');
-  }, []);
-
-  const handleSubmit = useCallback(() => {
-    if (!answer.trim() || state !== 'playing') return;
-    Game.submit(answer);
-    setFeedback(null);
-  }, [answer, state]);
 
   const handleExit = useCallback(() => {
     if (showExitConfirm) {
@@ -353,12 +354,21 @@ export const PlayPage = () => {
               <div className={styles.statItem}>
                 <span className={styles.statLabel}>正确率</span>
                 <span className={styles.statValue}>
-                  {snapshot ? Math.round((snapshot.correctCount / Math.max(1, snapshot.questionIndex)) * 100) : 0}%
+                  {snapshot && snapshot.questionIndex > 0
+                    ? Math.round((snapshot.correct / snapshot.questionIndex) * 100)
+                    : snapshot?.correct
+                    ? 100
+                    : 0}
+                  %
                 </span>
               </div>
               <div className={styles.statItem}>
-                <span className={styles.statLabel}>当前得分</span>
-                <span className={styles.statValue}>{snapshot?.score ?? 0}</span>
+                <span className={styles.statLabel}>当前连击</span>
+                <span className={styles.statValue}>{snapshot?.combo ?? 0}</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>最高连击</span>
+                <span className={styles.statValue}>{snapshot?.maxCombo ?? 0}</span>
               </div>
             </div>
           </div>

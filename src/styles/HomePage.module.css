@@ -1,10 +1,15 @@
 .hero {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
   gap: 40px;
-  align-items: center;
+  align-items: stretch;
   overflow: visible;
   padding: 32px;
+}
+
+.heroMain {
+  display: grid;
+  gap: 28px;
 }
 
 .welcome {
@@ -30,25 +35,128 @@
   line-height: 1.6;
 }
 
+.heroSummary {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  backdrop-filter: blur(12px);
+}
+
+.progressBlock {
+  display: grid;
+  gap: 14px;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #9a3412;
+  font-weight: 600;
+}
+
+.progressHeader strong {
+  font-size: 1.4rem;
+}
+
+.progressBar {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(248, 113, 113, 0.25);
+  overflow: hidden;
+}
+
+.progressFill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #f97316, #fb923c, #fbbf24);
+  border-radius: inherit;
+  transition: width 0.4s ease;
+}
+
+.progressHint {
+  color: rgba(124, 45, 18, 0.9);
+  font-size: 0.9rem;
+}
+
+.statHighlights {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.statChip {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 247, 237, 0.7);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  display: grid;
+  gap: 6px;
+  color: #c2410c;
+  text-align: left;
+}
+
+.statChip span {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.statChip strong {
+  font-size: 1.1rem;
+}
+
 .actions {
-  margin-top: 24px;
+  margin-top: 8px;
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
 }
 
-.badges {
+.heroAside {
   display: grid;
-  gap: 20px;
-  color: #9a3412;
-  font-weight: 500;
+  gap: 18px;
 }
 
-.badges > div {
-  padding: 20px;
-  border-radius: 16px;
-  background: rgba(251, 146, 60, 0.15);
-  border: 2px solid rgba(249, 115, 22, 0.25);
+.badgeCard {
+  padding: 22px 20px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), rgba(253, 186, 116, 0.12));
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  color: #9a3412;
+  display: grid;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.badgeCard::after {
+  content: '';
+  position: absolute;
+  inset: auto -40% -70% auto;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle at center, rgba(251, 191, 36, 0.4), transparent 70%);
+  transform: rotate(15deg);
+  pointer-events: none;
+}
+
+.badgeValue {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #7c2d12;
+}
+
+.badgeCard small {
+  color: rgba(124, 45, 18, 0.75);
+}
+
+.nextChallenge {
+  background: linear-gradient(135deg, rgba(190, 242, 100, 0.25), rgba(147, 197, 253, 0.2));
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .sectionHeader {
@@ -148,6 +256,10 @@
 
   .hero h2 {
     font-size: 2.2rem;
+  }
+
+  .heroSummary {
+    padding: 18px;
   }
 
   .levelList {
