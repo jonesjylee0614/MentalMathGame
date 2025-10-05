@@ -175,7 +175,7 @@ export const PlayPage = () => {
       unsubFinish();
       Game.reset();
     };
-  }, [level, navigate, playSound, recordResult, setLastResult, handleNumberClick, handleSubmit, handleDelete, handleClear]);
+  }, [level, navigate, playSound, recordResult, setLastResult]);
 
   if (!level) {
     return (
