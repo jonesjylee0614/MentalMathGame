@@ -1,4 +1,4 @@
-import { CSSProperties, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { CSSProperties, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { Game } from '../lib/engine';
@@ -37,11 +37,14 @@ export const PlayPage = () => {
   const [playerDamaged, setPlayerDamaged] = useState(false);
   const [showStars, setShowStars] = useState(false);
   const [encouragingMsg, setEncouragingMsg] = useState('');
-  const [showBullet, setShowBullet] = useState(false);
-  const [showZombieBullet, setShowZombieBullet] = useState(false);
   const [bullets, setBullets] = useState<number[]>([]); // 多个子弹
   const [zombieBullets, setZombieBullets] = useState<number[]>([]); // 多个僵尸子弹
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [wrongAnswers, setWrongAnswers] = useState<
+    Array<{ id: number; question: string; userAnswer: string; correctAnswer?: string }>
+  >([]);
+  const lastQuestionRef = useRef<Question | null>(null);
+  const lastAnswerRef = useRef('');
   const playSound = useFeedbackSound(settings.audio);
 
   const handleNumberClick = useCallback(
@@ -63,6 +66,7 @@ export const PlayPage = () => {
   const handleSubmit = useCallback(() => {
     if (!answer.trim() || state !== 'playing' || isSubmitting) return;
     setIsSubmitting(true);
+    lastAnswerRef.current = answer;
     Game.submit(answer);
     setFeedback(null);
   }, [answer, state, isSubmitting]);
@@ -109,6 +113,7 @@ export const PlayPage = () => {
     const unsubState = Game.on('statechange', ({ state: nextState }) => setState(nextState));
     const unsubQuestion = Game.on('question', (next) => {
       setQuestion(next);
+      lastQuestionRef.current = next;
       // Don't clear answer here - wait for user to see result
       setFeedback(null); // Clear feedback when moving to next question
     });
@@ -149,7 +154,19 @@ export const PlayPage = () => {
         }, 1200);
       } else {
         setZombieAttacking(true);
-        
+
+        setWrongAnswers((prev) => {
+          const currentQuestion = lastQuestionRef.current;
+          const newItem = {
+            id: Date.now(),
+            question: currentQuestion?.text ?? '未知题目',
+            userAnswer: lastAnswerRef.current.trim() ? lastAnswerRef.current : '未作答',
+            correctAnswer: fb.expected
+          };
+          const next = [newItem, ...prev];
+          return next.slice(0, 6);
+        });
+
         // 连续发射3个僵尸子弹
         [0, 1, 2].forEach((i) => {
           setTimeout(() => {
@@ -180,6 +197,9 @@ export const PlayPage = () => {
       navigate('/result');
     });
 
+    setWrongAnswers([]);
+    lastQuestionRef.current = null;
+    lastAnswerRef.current = '';
     Game.init(level);
     Game.start();
     setError(null);
@@ -278,6 +298,22 @@ export const PlayPage = () => {
     return `还有 ${remaining} 题，继续战斗！`;
   }, [answeredQuestions, totalQuestions, snapshot, monsterHpPercent, playerHpPercent]);
 
+  const questionPanelClass = [
+    'glass-card',
+    styles.questionPanel,
+    feedback && feedback.correct ? styles.questionPanelCorrect : '',
+    feedback && !feedback.correct ? styles.questionPanelWrong : ''
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const answerInputClass = [
+    answer ? styles.hasValue : '',
+    feedback && !feedback.correct ? styles.answerError : ''
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <div className={`fade-in ${styles.wrapper}`}>
       {/* 顶部状态区：关卡名 + 进度 + 倒计时 */}
@@ -349,7 +385,7 @@ export const PlayPage = () => {
 
       {/* 主区：题目(左) + 输入区(右) */}
       <main className={styles.stage}>
-        <div className={`glass-card ${styles.questionPanel}`}>
+        <div className={questionPanelClass}>
           {showStars && <div className={styles.starBurst} aria-hidden="true" />}
           <div className={styles.questionHeader}>
             <span className={styles.questionIndex}>第 {currentQuestion || 1} 题</span>
@@ -397,6 +433,23 @@ export const PlayPage = () => {
           )}
         </div>
 
+        {wrongAnswers.length > 0 && (
+          <aside className={styles.wrongList}>
+            <div className={styles.wrongListHeader}>❌ 错题清单</div>
+            <ul className={styles.wrongListBody}>
+              {wrongAnswers.map((item) => (
+                <li key={item.id} className={styles.wrongListItem}>
+                  <div className={styles.wrongQuestion}>{item.question}</div>
+                  <div className={styles.wrongAnswers}>
+                    <span className={styles.wrongUser}>你的答案：{item.userAnswer}</span>
+                    <span className={styles.wrongCorrect}>正确答案：{item.correctAnswer ?? '未知'}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
+
         <div className={styles.inputArea}>
           <div className={`glass-card ${styles.answerPanel}`}>
             <label className={styles.answerLabel}>你的答案</label>
@@ -405,7 +458,7 @@ export const PlayPage = () => {
                 value={answer}
                 placeholder="请输入答案"
                 readOnly
-                className={answer ? styles.hasValue : ''}
+                className={answerInputClass || undefined}
               />
             </div>
           </div>

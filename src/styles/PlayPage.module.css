@@ -115,6 +115,10 @@
   align-items: center;
   gap: clamp(20px, 3vw, 40px);
   padding: 0 clamp(20px, 3vw, 40px);
+  --bullet-start: 18%;
+  --bullet-end: 82%;
+  --zombie-bullet-start: 18%;
+  --zombie-bullet-end: 82%;
 }
 
 .characterWrapper {
@@ -193,26 +197,28 @@
 
 .bullet {
   position: absolute;
-  left: 8%;
+  left: var(--bullet-start);
   top: 50%;
   font-size: clamp(2rem, 4vw, 3rem);
-  animation: bulletFly 0.6s linear forwards;
+  animation: bulletFly 0.7s cubic-bezier(0.25, 0.8, 0.4, 1) forwards;
   z-index: 50;
   pointer-events: none;
-  filter: drop-shadow(0 0 10px rgba(34, 197, 94, 1)) 
+  transform: translate(-50%, -50%) scale(0.6);
+  filter: drop-shadow(0 0 10px rgba(34, 197, 94, 1))
           drop-shadow(0 0 20px rgba(34, 197, 94, 0.5))
           drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .zombieBullet {
   position: absolute;
-  right: 8%;
+  right: var(--zombie-bullet-start);
   top: 50%;
   font-size: clamp(2rem, 4vw, 3rem);
-  animation: zombieBulletFly 0.6s linear forwards;
+  animation: zombieBulletFly 0.65s cubic-bezier(0.25, 0.8, 0.4, 1) forwards;
   z-index: 50;
   pointer-events: none;
-  filter: drop-shadow(0 0 10px rgba(234, 88, 12, 1)) 
+  transform: translate(50%, -50%) scale(0.6) scaleX(-1);
+  filter: drop-shadow(0 0 10px rgba(234, 88, 12, 1))
           drop-shadow(0 0 20px rgba(234, 88, 12, 0.5))
           drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
@@ -220,7 +226,7 @@
 .comboBadge {
   position: absolute;
   top: 50%;
-  right: 15%; /* 靠近右侧（被攻击方） */
+  right: clamp(2%, 4vw, 6%); /* 靠近右侧（被攻击方） */
   transform: translateY(-50%);
   padding: 10px 20px;
   border-radius: 16px;
@@ -289,6 +295,7 @@
   gap: clamp(12px, 1.8vw, 20px);
   align-items: stretch;
   overflow: hidden;
+  padding-right: min(280px, 24vw);
 }
 
 .inputArea {
@@ -310,6 +317,17 @@
   justify-content: center;
   align-items: center;
   min-height: 0;
+}
+
+.questionPanelCorrect {
+  border-color: rgba(34, 197, 94, 0.55);
+  box-shadow: 0 16px 40px rgba(34, 197, 94, 0.25);
+}
+
+.questionPanelWrong {
+  border-color: rgba(239, 68, 68, 0.65);
+  box-shadow: 0 16px 46px rgba(239, 68, 68, 0.35);
+  animation: panelShake 0.55s ease;
 }
 
 .feedbackOverlay {
@@ -448,6 +466,12 @@
   border-color: rgba(249, 115, 22, 0.6);
   box-shadow: inset 0 4px 16px rgba(249, 115, 22, 0.22), 0 0 0 4px rgba(249, 115, 22, 0.15);
   animation: inputGlow 0.3s ease;
+}
+
+.answerError {
+  border-color: rgba(239, 68, 68, 0.75);
+  box-shadow: inset 0 4px 16px rgba(239, 68, 68, 0.28), 0 0 0 4px rgba(239, 68, 68, 0.2);
+  animation: inputShake 0.45s ease;
 }
 
 .answerDisplay input:focus {
@@ -693,6 +717,87 @@
   white-space: nowrap;
 }
 
+.wrongList {
+  position: absolute;
+  top: clamp(16px, 2vh, 28px);
+  right: clamp(16px, 2vw, 32px);
+  width: min(280px, 28vw);
+  max-height: min(60vh, 340px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(239, 68, 68, 0.35);
+  box-shadow: 0 16px 40px rgba(239, 68, 68, 0.2);
+  backdrop-filter: blur(6px);
+  z-index: 6;
+}
+
+.wrongListHeader {
+  font-weight: 900;
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  color: #b91c1c;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wrongListBody {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.wrongListBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wrongListBody::-webkit-scrollbar-thumb {
+  background: rgba(239, 68, 68, 0.4);
+  border-radius: 999px;
+}
+
+.wrongListItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(254, 226, 226, 0.7);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  box-shadow: inset 0 2px 6px rgba(239, 68, 68, 0.15);
+}
+
+.wrongQuestion {
+  font-weight: 800;
+  color: #7f1d1d;
+  font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+}
+
+.wrongAnswers {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+  color: #b91c1c;
+}
+
+.wrongUser {
+  font-weight: 700;
+}
+
+.wrongCorrect {
+  font-weight: 600;
+  color: #7c2d12;
+}
+
 @keyframes timerPulse {
   0%, 100% {
     transform: scale(1);
@@ -716,47 +821,45 @@
 
 @keyframes bulletFly {
   0% {
-    left: 8%;
-    opacity: 1;
-    transform: translateY(-50%) scale(0.6);
+    left: var(--bullet-start);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
   }
-  10% {
-    left: 15%;
+  15% {
     opacity: 1;
-    transform: translateY(-50%) scale(0.8);
+    transform: translate(-50%, -55%) scale(0.8);
   }
   85% {
-    left: 88%;
+    left: calc(var(--bullet-end) - 2%);
     opacity: 1;
-    transform: translateY(-50%) scale(1);
+    transform: translate(-50%, -48%) scale(1.05);
   }
   100% {
-    left: 92%;
+    left: var(--bullet-end);
     opacity: 0;
-    transform: translateY(-50%) scale(1.3);
+    transform: translate(-50%, -50%) scale(1.2);
   }
 }
 
 @keyframes zombieBulletFly {
   0% {
-    right: 8%;
-    opacity: 1;
-    transform: translateY(-50%) scale(0.6) scaleX(-1);
+    right: var(--zombie-bullet-start);
+    opacity: 0;
+    transform: translate(50%, -50%) scale(0.6) scaleX(-1);
   }
-  10% {
-    right: 15%;
+  15% {
     opacity: 1;
-    transform: translateY(-50%) scale(0.8) scaleX(-1);
+    transform: translate(50%, -55%) scale(0.8) scaleX(-1);
   }
   85% {
-    right: 88%;
+    right: calc(var(--zombie-bullet-end) - 2%);
     opacity: 1;
-    transform: translateY(-50%) scale(1) scaleX(-1);
+    transform: translate(50%, -48%) scale(1.05) scaleX(-1);
   }
   100% {
-    right: 92%;
+    right: var(--zombie-bullet-end);
     opacity: 0;
-    transform: translateY(-50%) scale(1.3) scaleX(-1);
+    transform: translate(50%, -50%) scale(1.2) scaleX(-1);
   }
 }
 
@@ -875,6 +978,42 @@
   }
 }
 
+@keyframes panelShake {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-10px, -2px);
+  }
+  40% {
+    transform: translate(8px, 2px);
+  }
+  60% {
+    transform: translate(-6px, 1px);
+  }
+  80% {
+    transform: translate(4px, -1px);
+  }
+}
+
+@keyframes inputShake {
+  0%, 100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.02) translateX(-6px);
+  }
+  40% {
+    transform: scale(1.03) translateX(6px);
+  }
+  60% {
+    transform: scale(1.02) translateX(-4px);
+  }
+  80% {
+    transform: scale(1.01) translateX(4px);
+  }
+}
+
 @keyframes questionSlideIn {
   0% {
     transform: translateX(-30px) scale(0.9);
@@ -893,6 +1032,7 @@
   /* Tablet landscape optimization */
   .stage {
     grid-template-columns: 1.3fr 1fr;
+    padding-right: min(220px, 22vw);
   }
   
   .questionText {
@@ -909,6 +1049,7 @@
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
     gap: clamp(10px, 1.5vh, 14px);
+    padding-right: 0;
   }
 
   .inputArea {
@@ -934,6 +1075,23 @@
 
   .battleRow {
     gap: clamp(12px, 2vw, 20px);
+    --bullet-start: 22%;
+    --bullet-end: 78%;
+    --zombie-bullet-start: 22%;
+    --zombie-bullet-end: 78%;
+  }
+
+  .wrongList {
+    position: static;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    margin-top: 8px;
+    order: 5;
+  }
+
+  .wrongListBody {
+    max-height: none;
   }
 
   .characterIcon {
@@ -987,6 +1145,10 @@
   .battleRow {
     flex-direction: row;
     gap: 20px;
+    --bullet-start: 25%;
+    --bullet-end: 75%;
+    --zombie-bullet-start: 25%;
+    --zombie-bullet-end: 75%;
   }
 
   .characterWrapper {
@@ -999,6 +1161,10 @@
     left: auto;
     transform: none;
     margin: 8px 0;
+  }
+
+  .wrongList {
+    padding: 14px 16px;
   }
 
   .questionPanel {
