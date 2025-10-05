@@ -27,23 +27,28 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 12px;
-  margin-bottom: 18px;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.categoryHeader h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 
 .levelGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
+  gap: 20px;
 }
 
 .levelCard {
-  padding: 20px;
-  border-radius: 16px;
+  padding: 24px;
+  border-radius: 18px;
   border: 2px solid rgba(249, 115, 22, 0.3);
   background: linear-gradient(135deg, rgba(254, 215, 170, 0.6), rgba(253, 186, 116, 0.4));
   display: grid;
-  gap: 14px;
+  gap: 16px;
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
