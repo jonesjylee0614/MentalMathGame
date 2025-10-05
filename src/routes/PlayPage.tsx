@@ -1,4 +1,4 @@
-import { CSSProperties, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { CSSProperties, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { Game } from '../lib/engine';
@@ -37,12 +37,35 @@ export const PlayPage = () => {
   const [playerDamaged, setPlayerDamaged] = useState(false);
   const [showStars, setShowStars] = useState(false);
   const [encouragingMsg, setEncouragingMsg] = useState('');
-  const [showBullet, setShowBullet] = useState(false);
-  const [showZombieBullet, setShowZombieBullet] = useState(false);
   const [bullets, setBullets] = useState<number[]>([]); // 多个子弹
   const [zombieBullets, setZombieBullets] = useState<number[]>([]); // 多个僵尸子弹
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [wrongAnswers, setWrongAnswers] = useState<
+    Array<{ id: number; question: string; userAnswer: string; correctAnswer?: string }>
+  >([]);
+  const lastQuestionRef = useRef<Question | null>(null);
+  const lastAnswerRef = useRef('');
   const playSound = useFeedbackSound(settings.audio);
+
+  const fireProjectiles = useCallback(
+    (
+      count: number,
+      interval: number,
+      setter: React.Dispatch<React.SetStateAction<number[]>>,
+      lifetime: number
+    ) => {
+      Array.from({ length: count }).forEach((_, index) => {
+        setTimeout(() => {
+          const bulletId = Date.now() + index;
+          setter((prev) => [...prev, bulletId]);
+          setTimeout(() => {
+            setter((prev) => prev.filter((id) => id !== bulletId));
+          }, lifetime);
+        }, index * interval);
+      });
+    },
+    []
+  );
 
   const handleNumberClick = useCallback(
     (num: string) => {
@@ -63,6 +86,7 @@ export const PlayPage = () => {
   const handleSubmit = useCallback(() => {
     if (!answer.trim() || state !== 'playing' || isSubmitting) return;
     setIsSubmitting(true);
+    lastAnswerRef.current = answer;
     Game.submit(answer);
     setFeedback(null);
   }, [answer, state, isSubmitting]);
@@ -109,6 +133,7 @@ export const PlayPage = () => {
     const unsubState = Game.on('statechange', ({ state: nextState }) => setState(nextState));
     const unsubQuestion = Game.on('question', (next) => {
       setQuestion(next);
+      lastQuestionRef.current = next;
       // Don't clear answer here - wait for user to see result
       setFeedback(null); // Clear feedback when moving to next question
     });
@@ -130,42 +155,50 @@ export const PlayPage = () => {
         setPlantAttacking(true);
         setShowStars(true);
         
-        // 连续发射3个子弹
-        [0, 1, 2].forEach((i) => {
-          setTimeout(() => {
-            setBullets((prev) => [...prev, Date.now() + i]);
-          }, i * 150); // 每150ms发射一个
-        });
-        
+        // 连续发射子弹
+        fireProjectiles(3, 220, setBullets, 1600);
+
         setTimeout(() => {
           setZombieDamaged(true);
-        }, 350);
-        
+        }, 900);
+
+        setTimeout(() => {
+          setZombieDamaged(false);
+        }, 1300);
+
         setTimeout(() => {
           setPlantAttacking(false);
-          setZombieDamaged(false);
           setShowStars(false);
-          setBullets([]);
-        }, 1200);
+        }, 1700);
       } else {
         setZombieAttacking(true);
-        
-        // 连续发射3个僵尸子弹
-        [0, 1, 2].forEach((i) => {
-          setTimeout(() => {
-            setZombieBullets((prev) => [...prev, Date.now() + i]);
-          }, i * 120); // 每120ms发射一个
+
+        setWrongAnswers((prev) => {
+          const currentQuestion = lastQuestionRef.current;
+          const newItem = {
+            id: Date.now(),
+            question: currentQuestion?.text ?? '未知题目',
+            userAnswer: lastAnswerRef.current.trim() ? lastAnswerRef.current : '未作答',
+            correctAnswer: fb.expected
+          };
+          const next = [newItem, ...prev];
+          return next.slice(0, 6);
         });
-        
+
+        // 连续发射僵尸子弹
+        fireProjectiles(3, 200, setZombieBullets, 1500);
+
         setTimeout(() => {
           setPlayerDamaged(true);
-        }, 300);
-        
+        }, 780);
+
+        setTimeout(() => {
+          setPlayerDamaged(false);
+        }, 1180);
+
         setTimeout(() => {
           setZombieAttacking(false);
-          setPlayerDamaged(false);
-          setZombieBullets([]);
-        }, 800);
+        }, 1500);
       }
     });
     const unsubFinish = Game.on('finish', (result) => {
@@ -180,6 +213,9 @@ export const PlayPage = () => {
       navigate('/result');
     });
 
+    setWrongAnswers([]);
+    lastQuestionRef.current = null;
+    lastAnswerRef.current = '';
     Game.init(level);
     Game.start();
     setError(null);
@@ -193,7 +229,7 @@ export const PlayPage = () => {
       unsubFinish();
       Game.reset();
     };
-  }, [level, navigate, playSound, recordResult, setLastResult]);
+  }, [level, navigate, playSound, recordResult, setLastResult, fireProjectiles]);
 
   if (!level) {
     return (
@@ -278,6 +314,22 @@ export const PlayPage = () => {
     return `还有 ${remaining} 题，继续战斗！`;
   }, [answeredQuestions, totalQuestions, snapshot, monsterHpPercent, playerHpPercent]);
 
+  const questionPanelClass = [
+    'glass-card',
+    styles.questionPanel,
+    feedback && feedback.correct ? styles.questionPanelCorrect : '',
+    feedback && !feedback.correct ? styles.questionPanelWrong : ''
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const answerInputClass = [
+    answer ? styles.hasValue : '',
+    feedback && !feedback.correct ? styles.answerError : ''
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <div className={`fade-in ${styles.wrapper}`}>
       {/* 顶部状态区：关卡名 + 进度 + 倒计时 */}
@@ -349,7 +401,8 @@ export const PlayPage = () => {
 
       {/* 主区：题目(左) + 输入区(右) */}
       <main className={styles.stage}>
-        <div className={`glass-card ${styles.questionPanel}`}>
+        <div className={styles.questionColumn}>
+          <div className={questionPanelClass}>
           {showStars && <div className={styles.starBurst} aria-hidden="true" />}
           <div className={styles.questionHeader}>
             <span className={styles.questionIndex}>第 {currentQuestion || 1} 题</span>
@@ -395,54 +448,80 @@ export const PlayPage = () => {
               </div>
             </>
           )}
+          </div>
         </div>
 
-        <div className={styles.inputArea}>
-          <div className={`glass-card ${styles.answerPanel}`}>
-            <label className={styles.answerLabel}>你的答案</label>
-            <div className={styles.answerDisplay}>
-              <input
-                value={answer}
-                placeholder="请输入答案"
-                readOnly
-                className={answer ? styles.hasValue : ''}
-              />
+        <div className={styles.interactionColumn}>
+          <div className={styles.inputArea}>
+            <div className={`glass-card ${styles.answerPanel}`}>
+              <label className={styles.answerLabel}>你的答案</label>
+              <div className={styles.answerDisplay}>
+                <input
+                  value={answer}
+                  placeholder="请输入答案"
+                  readOnly
+                  className={answerInputClass || undefined}
+                />
+              </div>
             </div>
+            <form className={`glass-card ${styles.keypadPanel}`} onSubmit={onSubmit}>
+              <div className={styles.padGrid}>
+                {keypadButtons.map(({ key, label, onPress, type = 'button', variant, span }) => {
+                  const variantClass =
+                    variant === 'action' ? styles.padAction : variant === 'submit' ? styles.padSubmit : '';
+                  const spanClass = span === 'wide' ? styles.padWide : '';
+                  const classes = [styles.padButton, variantClass, spanClass].filter(Boolean).join(' ');
+
+                  return (
+                    <button
+                      key={key}
+                      type={type}
+                      onClick={(evt) => {
+                        evt.preventDefault(); // 阻止所有按钮的默认行为
+                        evt.stopPropagation(); // 阻止事件冒泡
+                        if (type === 'submit') {
+                          // 提交按钮：检查答案和状态
+                          if (!answer.trim() || state !== 'playing' || isSubmitting) return;
+                        } else {
+                          // 数字/操作按钮：如果正在提交中则禁止输入
+                          if (isSubmitting) return;
+                        }
+                        onPress();
+                      }}
+                      disabled={type === 'submit' && (!answer.trim() || state !== 'playing' || isSubmitting)}
+                      className={classes}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </form>
           </div>
 
-          <form className={`glass-card ${styles.keypadPanel}`} onSubmit={onSubmit}>
-            <div className={styles.padGrid}>
-              {keypadButtons.map(({ key, label, onPress, type = 'button', variant, span }) => {
-                const variantClass =
-                  variant === 'action' ? styles.padAction : variant === 'submit' ? styles.padSubmit : '';
-                const spanClass = span === 'wide' ? styles.padWide : '';
-                const classes = [styles.padButton, variantClass, spanClass].filter(Boolean).join(' ');
-
-                return (
-                  <button
-                    key={key}
-                    type={type}
-                    onClick={(evt) => {
-                      evt.preventDefault(); // 阻止所有按钮的默认行为
-                      evt.stopPropagation(); // 阻止事件冒泡
-                      if (type === 'submit') {
-                        // 提交按钮：检查答案和状态
-                        if (!answer.trim() || state !== 'playing' || isSubmitting) return;
-                      } else {
-                        // 数字/操作按钮：如果正在提交中则禁止输入
-                        if (isSubmitting) return;
-                      }
-                      onPress();
-                    }}
-                    disabled={type === 'submit' && (!answer.trim() || state !== 'playing' || isSubmitting)}
-                    className={classes}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          </form>
+          {wrongAnswers.length > 0 && (
+            <aside className={`glass-card ${styles.wrongList}`}>
+              <div className={styles.wrongListHeader}>❌ 错题清单</div>
+              <ul className={styles.wrongListBody}>
+                {wrongAnswers.map((item) => (
+                  <li key={item.id} className={styles.wrongListItem}>
+                    <span className={styles.wrongQuestion} title={item.question}>
+                      {item.question}
+                    </span>
+                    <span className={styles.wrongUser} title={`你的答案：${item.userAnswer}`}>
+                      你的：{item.userAnswer}
+                    </span>
+                    <span
+                      className={styles.wrongCorrect}
+                      title={`正确答案：${item.correctAnswer ?? '未知'}`}
+                    >
+                      正确：{item.correctAnswer ?? '未知'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
         </div>
       </main>
 
