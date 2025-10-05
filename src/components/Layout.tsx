@@ -53,6 +53,57 @@ export const Layout = ({ children }: PropsWithChildren) => {
         <div className={styles.sidebarGlow} />
       </aside>
       <main className={styles.main}>
+        <div className={styles.topBar}>
+          <button className={styles.homeButton} onClick={() => navigate('/')}>
+            🏠 首页
+          </button>
+          <div className={styles.topBarRight}>
+            <div className={styles.userInfo}>
+              <span className={styles.userName}>{profile.name}</span>
+              <span className={styles.userScore}>{stats.totalScore} 分</span>
+            </div>
+            <button className={styles.menuButton} onClick={() => setShowMenu(!showMenu)}>
+              ☰
+            </button>
+          </div>
+        </div>
+
+        {showMenu && (
+          <>
+            <div className={styles.menuOverlay} onClick={() => setShowMenu(false)} />
+            <div className={styles.menuPanel}>
+              <div className={styles.menuHeader}>
+                <h3>菜单</h3>
+                <button className={styles.closeButton} onClick={() => setShowMenu(false)}>×</button>
+              </div>
+              <div className={styles.menuItems}>
+                <button className={styles.menuItem} onClick={() => handleMenuClick('/')}>
+                  <span className={styles.menuIcon}>🏠</span>
+                  <span>首页</span>
+                </button>
+                <button className={styles.menuItem} onClick={() => handleMenuClick('/levels')}>
+                  <span className={styles.menuIcon}>🧩</span>
+                  <span>关卡</span>
+                </button>
+                <button className={styles.menuItem} onClick={() => handleMenuClick('/stats')}>
+                  <span className={styles.menuIcon}>📊</span>
+                  <span>统计</span>
+                </button>
+                <button className={styles.menuItem} onClick={() => handleMenuClick('/settings')}>
+                  <span className={styles.menuIcon}>⚙️</span>
+                  <span>设置</span>
+                </button>
+              </div>
+              <div className={styles.menuFooter}>
+                <div className={styles.profileInfo}>
+                  <p className={styles.profileName}>{profile.name}</p>
+                  <p className={styles.profileScore}>累计积分: {stats.totalScore}</p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
         <header className={styles.header}>
           <h1 className={styles.title}>Mental Math Arena</h1>
           <p className={styles.subtitle}>{subtitle}</p>
