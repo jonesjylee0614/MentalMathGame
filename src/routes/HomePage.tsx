@@ -24,12 +24,56 @@ export const HomePage = () => {
   return (
     <div className="fade-in">
       <section className={`glass-card ${styles.hero}`}>
-        <div>
-          <p className={styles.welcome}>你好，{profile.name}</p>
-          <h2>累计积分 {stats.totalScore}</h2>
-          <p>
-            共完成 <strong>{stats.totalPlays}</strong> 场挑战，最佳连击 <strong>{stats.bestCombo}</strong>。
-          </p>
+        <div className={styles.heroMain}>
+          <div>
+            <p className={styles.welcome}>你好，{profile.name}</p>
+            <h2>累计积分 {stats.totalScore}</h2>
+            <p>
+              共完成 <strong>{stats.totalPlays}</strong> 场挑战，最佳连击 <strong>{stats.bestCombo}</strong>。
+            </p>
+          </div>
+
+          <div className={styles.heroSummary}>
+            <div className={styles.progressBlock}>
+              <div className={styles.progressHeader}>
+                <span>关卡探索进度</span>
+                <strong>
+                  {LEVELS.length ? Math.round((Math.min(progress.length, LEVELS.length) / LEVELS.length) * 100) : 0}%
+                </strong>
+              </div>
+              <div className={styles.progressBar}>
+                <div
+                  className={styles.progressFill}
+                  style={{
+                    width: `${LEVELS.length ? (Math.min(progress.length, LEVELS.length) / LEVELS.length) * 100 : 0}%`
+                  }}
+                />
+              </div>
+              <p className={styles.progressHint}>
+                已解锁 <strong>{progress.length}</strong> / {LEVELS.length} 个关卡
+              </p>
+            </div>
+            <div className={styles.statHighlights}>
+              <div className={styles.statChip}>
+                <span>平均正确率</span>
+                <strong>
+                  {stats.totalCorrect + stats.totalWrong
+                    ? Math.round((stats.totalCorrect / (stats.totalCorrect + stats.totalWrong)) * 100)
+                    : 0}
+                  %
+                </strong>
+              </div>
+              <div className={styles.statChip}>
+                <span>总答题数</span>
+                <strong>{stats.totalCorrect + stats.totalWrong}</strong>
+              </div>
+              <div className={styles.statChip}>
+                <span>累计时长</span>
+                <strong>{Math.round(stats.totalTimeSec / 60)} 分钟</strong>
+              </div>
+            </div>
+          </div>
+
           <div className={styles.actions}>
             <button className="btn" onClick={() => navigate('/levels')}>
               🚀 开始挑战
@@ -44,22 +88,36 @@ export const HomePage = () => {
             </button>
           </div>
         </div>
-        <div className={styles.badges}>
-          <div>
-            <span className="tag">创建于</span>
-            <p>{formatDate(profile.createdAt)}</p>
+        <div className={styles.heroAside}>
+          <div className={styles.badgeCard}>
+            <span className="tag">加入勇者团</span>
+            <p className={styles.badgeValue}>{formatDate(profile.createdAt)}</p>
+            <small>保持每日训练，打造最强心算力！</small>
           </div>
           {bestScore ? (
-            <div>
-              <span className="tag">最高分</span>
-              <p>
-                {bestScore.bestScore} 分 @ {bestScore.levelId}
-              </p>
+            <div className={styles.badgeCard}>
+              <span className="tag">最高得分记录</span>
+              <p className={styles.badgeValue}>{bestScore.bestScore} 分</p>
+              <small>来自关卡 {bestScore.levelId}</small>
             </div>
           ) : (
-            <div>
+            <div className={styles.badgeCard}>
               <span className="tag">新冒险者</span>
-              <p>快去挑战第一个关卡吧！</p>
+              <p className={styles.badgeValue}>探索从现在开始</p>
+              <small>试试基础关卡热热身 🔥</small>
+            </div>
+          )}
+          {lastLevel ? (
+            <div className={`${styles.badgeCard} ${styles.nextChallenge}`}>
+              <span className="tag">下一个目标</span>
+              <p className={styles.badgeValue}>{lastLevel.name}</p>
+              <small>{lastLevel.desc}</small>
+            </div>
+          ) : (
+            <div className={`${styles.badgeCard} ${styles.nextChallenge}`}>
+              <span className="tag">今日建议</span>
+              <p className={styles.badgeValue}>完成首个挑战</p>
+              <small>任选一个关卡开启旅程 ✨</small>
             </div>
           )}
         </div>
