@@ -6,6 +6,7 @@ import { findLevel } from '../lib/levels';
 import { formatTime } from '../lib/utils';
 import { useFeedbackSound } from '../lib/sound';
 import { GameResult, GameSnapshot, Question } from '../lib/types';
+import { useProjectileAnimations } from '../hooks/useProjectileAnimations';
 import styles from '../styles/PlayPage.module.css';
 
 const encouragingMessages = [
@@ -37,10 +38,14 @@ export const PlayPage = () => {
   const [playerDamaged, setPlayerDamaged] = useState(false);
   const [showStars, setShowStars] = useState(false);
   const [encouragingMsg, setEncouragingMsg] = useState('');
-  const [showBullet, setShowBullet] = useState(false);
-  const [showZombieBullet, setShowZombieBullet] = useState(false);
-  const [bullets, setBullets] = useState<number[]>([]); // 多个子弹
-  const [zombieBullets, setZombieBullets] = useState<number[]>([]); // 多个僵尸子弹
+  const {
+    plantProjectiles,
+    zombieProjectiles,
+    firePlantBurst,
+    fireZombieBurst,
+    clearPlantProjectiles,
+    clearZombieProjectiles,
+  } = useProjectileAnimations();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorListOpen, setErrorListOpen] = useState(false);
   const playSound = useFeedbackSound(settings.audio);
@@ -131,41 +136,31 @@ export const PlayPage = () => {
         setPlantAttacking(true);
         setShowStars(true);
         
-        // 连续发射5个子弹，慢慢飞
-        [0, 1, 2, 3, 4].forEach((i) => {
-          setTimeout(() => {
-            setBullets((prev) => [...prev, Date.now() + i]);
-          }, i * 200); // 每200ms发射一个
-        });
-        
+        firePlantBurst();
+
         setTimeout(() => {
           setZombieDamaged(true);
         }, 600);
-        
+
         setTimeout(() => {
           setPlantAttacking(false);
           setZombieDamaged(false);
           setShowStars(false);
-          setBullets([]);
+          clearPlantProjectiles();
         }, 2000);
       } else {
         setZombieAttacking(true);
-        
-        // 连续发射4个僵尸子弹
-        [0, 1, 2, 3].forEach((i) => {
-          setTimeout(() => {
-            setZombieBullets((prev) => [...prev, Date.now() + i]);
-          }, i * 180); // 每180ms发射一个
-        });
-        
+
+        fireZombieBurst();
+
         setTimeout(() => {
           setPlayerDamaged(true);
         }, 500);
-        
+
         setTimeout(() => {
           setZombieAttacking(false);
           setPlayerDamaged(false);
-          setZombieBullets([]);
+          clearZombieProjectiles();
         }, 1200);
       }
     });
@@ -373,10 +368,10 @@ export const PlayPage = () => {
       {/* 战斗区：角色 + 血条 + 连击 */}
       <section className={`glass-card ${styles.battleZone}`}>
         {/* 子弹层 - 在battleRow之外 */}
-        {bullets.map((id) => (
+        {plantProjectiles.map((id) => (
           <div key={id} className={styles.bullet}>🟢</div>
         ))}
-        {zombieBullets.map((id) => (
+        {zombieProjectiles.map((id) => (
           <div key={id} className={styles.zombieBullet}>🟤</div>
         ))}
         
