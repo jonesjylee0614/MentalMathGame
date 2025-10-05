@@ -318,7 +318,7 @@ export const PlayPage = () => {
               </div>
               <span className={styles.hpLabel}>{monsterHpPercent}%</span>
             </div>
-            <span className={`${styles.characterIcon} ${zombieAttacking ? styles.attacking : ''}`}>👾</span>
+            <span className={`${styles.characterIcon} ${zombieAttacking ? styles.attacking : ''}`}>👹</span>
           </div>
         </div>
       </section>
