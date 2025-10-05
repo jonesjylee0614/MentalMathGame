@@ -199,8 +199,8 @@
 
 .bullet {
   position: absolute;
-  left: 10%;
-  top: 50%;
+  left: 5%;
+  top: 60%;
   transform: translateY(-50%);
   font-size: clamp(2.5rem, 5vw, 4rem);
   animation: bulletFly 1.2s ease-out forwards;
@@ -217,8 +217,8 @@
 
 .zombieBullet {
   position: absolute;
-  right: 10%;
-  top: 50%;
+  right: 5%;
+  top: 60%;
   transform: translateY(-50%) scaleX(-1);
   font-size: clamp(2.5rem, 5vw, 4rem);
   animation: zombieBulletFly 1s ease-out forwards;
@@ -744,27 +744,27 @@
 
 @keyframes bulletFly {
   0% {
-    left: 10%;
+    left: 5%;
     opacity: 0;
     transform: translateY(-50%) scale(0.3);
   }
   5% {
-    left: 15%;
+    left: 10%;
     opacity: 1;
     transform: translateY(-50%) scale(0.7);
   }
   15% {
-    left: 25%;
+    left: 22%;
     opacity: 1;
     transform: translateY(-50%) scale(0.8) rotate(10deg);
   }
   30% {
-    left: 40%;
+    left: 38%;
     opacity: 1;
     transform: translateY(-50%) scale(0.9) rotate(-5deg);
   }
   50% {
-    left: 55%;
+    left: 54%;
     opacity: 1;
     transform: translateY(-50%) scale(1) rotate(5deg);
   }
@@ -774,12 +774,12 @@
     transform: translateY(-50%) scale(1.05) rotate(-3deg);
   }
   90% {
-    left: 85%;
+    left: 88%;
     opacity: 1;
     transform: translateY(-50%) scale(1.1);
   }
   100% {
-    left: 90%;
+    left: 95%;
     opacity: 0;
     transform: translateY(-50%) scale(1.5);
   }
@@ -787,27 +787,27 @@
 
 @keyframes zombieBulletFly {
   0% {
-    right: 10%;
+    right: 5%;
     opacity: 0;
     transform: translateY(-50%) scale(0.3) scaleX(-1);
   }
   5% {
-    right: 15%;
+    right: 10%;
     opacity: 1;
     transform: translateY(-50%) scale(0.7) scaleX(-1);
   }
   15% {
-    right: 25%;
+    right: 22%;
     opacity: 1;
     transform: translateY(-50%) scale(0.8) scaleX(-1) rotate(-10deg);
   }
   30% {
-    right: 40%;
+    right: 38%;
     opacity: 1;
     transform: translateY(-50%) scale(0.9) scaleX(-1) rotate(5deg);
   }
   50% {
-    right: 55%;
+    right: 54%;
     opacity: 1;
     transform: translateY(-50%) scale(1) scaleX(-1) rotate(-5deg);
   }
@@ -817,12 +817,12 @@
     transform: translateY(-50%) scale(1.05) scaleX(-1) rotate(3deg);
   }
   90% {
-    right: 85%;
+    right: 88%;
     opacity: 1;
     transform: translateY(-50%) scale(1.1) scaleX(-1);
   }
   100% {
-    right: 90%;
+    right: 95%;
     opacity: 0;
     transform: translateY(-50%) scale(1.5) scaleX(-1);
   }

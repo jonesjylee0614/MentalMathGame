@@ -372,6 +372,14 @@ export const PlayPage = () => {
 
       {/* 战斗区：角色 + 血条 + 连击 */}
       <section className={`glass-card ${styles.battleZone}`}>
+        {/* 子弹层 - 在battleRow之外 */}
+        {bullets.map((id) => (
+          <div key={id} className={styles.bullet}>🟢</div>
+        ))}
+        {zombieBullets.map((id) => (
+          <div key={id} className={styles.zombieBullet}>🟤</div>
+        ))}
+        
         <div className={styles.battleRow}>
           <div className={styles.characterWrapper}>
             <div className={styles.characterHpTop}>
@@ -385,13 +393,6 @@ export const PlayPage = () => {
             </div>
             <span className={`${styles.characterIcon} ${plantAttacking ? styles.attacking : ''}`}>🌻</span>
           </div>
-
-          {bullets.map((id) => (
-            <div key={id} className={styles.bullet}>🟢</div>
-          ))}
-          {zombieBullets.map((id) => (
-            <div key={id} className={styles.zombieBullet}>🟤</div>
-          ))}
 
           {snapshot && snapshot.combo > 0 && (
             <div className={styles.comboBadge}>
