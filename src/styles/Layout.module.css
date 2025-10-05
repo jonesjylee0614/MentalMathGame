@@ -2,27 +2,27 @@
   display: grid;
   grid-template-columns: 280px 1fr;
   min-height: 100vh;
-  background: radial-gradient(circle at top left, rgba(120, 90, 255, 0.15), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(0, 200, 255, 0.1), transparent 40%),
-    linear-gradient(135deg, #0f172a, #1e293b 60%, #0f172a);
-  color: #f8fafc;
+  background: radial-gradient(circle at top left, rgba(251, 146, 60, 0.2), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(252, 211, 77, 0.15), transparent 40%),
+    linear-gradient(135deg, #fff7ed, #ffedd5 60%, #fed7aa);
+  color: #7c2d12;
 }
 
 .colorblind {
-  background: radial-gradient(circle at top left, rgba(255, 196, 0, 0.2), transparent 55%),
-    radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.12), transparent 40%),
-    linear-gradient(135deg, #0b1120, #1f2937 60%, #0b1120);
+  background: radial-gradient(circle at top left, rgba(251, 191, 36, 0.25), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.15), transparent 40%),
+    linear-gradient(135deg, #fffbeb, #fef3c7 60%, #fde68a);
 }
 
 .sidebar {
   position: relative;
   padding: 32px 24px;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.6));
+  background: linear-gradient(180deg, rgba(254, 243, 199, 0.9), rgba(253, 230, 138, 0.7));
   backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
   gap: 24px;
-  border-right: 1px solid rgba(148, 163, 184, 0.15);
+  border-right: 2px solid rgba(249, 115, 22, 0.2);
 }
 
 .brand {
@@ -41,20 +41,22 @@
 .profileCard {
   border-radius: 16px;
   padding: 18px;
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(59, 130, 246, 0.05));
-  border: 1px solid rgba(59, 130, 246, 0.25);
-  box-shadow: 0 10px 25px rgba(15, 118, 230, 0.15);
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.25), rgba(249, 115, 22, 0.15));
+  border: 2px solid rgba(249, 115, 22, 0.3);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.2);
 }
 
 .profileName {
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 4px;
+  color: #9a3412;
 }
 
 .profileMeta {
   font-size: 0.9rem;
-  color: rgba(226, 232, 240, 0.75);
+  color: #c2410c;
+  font-weight: 600;
 }
 
 .nav {
@@ -66,27 +68,28 @@
 .navItem {
   padding: 12px 16px;
   border-radius: 12px;
-  color: rgba(226, 232, 240, 0.75);
+  color: #9a3412;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.25s ease;
 }
 
 .navItem:hover {
-  color: #f8fafc;
-  background: rgba(59, 130, 246, 0.15);
+  color: #7c2d12;
+  background: rgba(251, 146, 60, 0.2);
+  transform: translateX(4px);
 }
 
 .active {
   color: #ffffff;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(14, 165, 233, 0.4));
-  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.25);
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
 }
 
 .sidebarGlow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at bottom, rgba(59, 130, 246, 0.12), transparent 60%);
+  background: radial-gradient(circle at bottom, rgba(251, 146, 60, 0.15), transparent 60%);
   pointer-events: none;
   animation: pulse 6s ease-in-out infinite;
 }
@@ -105,14 +108,15 @@
   font-size: 2.4rem;
   font-weight: 800;
   margin-bottom: 8px;
-  background: linear-gradient(90deg, #e2e8f0, #60a5fa, #38bdf8);
+  background: linear-gradient(90deg, #f97316, #fb923c, #fbbf24);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-  color: rgba(226, 232, 240, 0.75);
-  font-size: 1rem;
+  color: #c2410c;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .content {

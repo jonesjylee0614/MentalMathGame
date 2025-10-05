@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { Game } from '../lib/engine';
@@ -7,6 +7,17 @@ import { formatTime } from '../lib/utils';
 import { useFeedbackSound } from '../lib/sound';
 import { GameResult, GameSnapshot, Question } from '../lib/types';
 import styles from '../styles/PlayPage.module.css';
+
+const encouragingMessages = [
+  '✅ 太棒了！答对啦！',
+  '🌟 你真聪明！',
+  '🎉 太厉害了！',
+  '💪 做得好！',
+  '👏 完美答案！',
+  '🚀 你是数学小天才！',
+  '⭐ 真棒！继续加油！',
+  '🎯 正确！太准了！',
+];
 
 export const PlayPage = () => {
   const { levelId } = useParams();
@@ -19,6 +30,13 @@ export const PlayPage = () => {
   const [feedback, setFeedback] = useState<{ correct: boolean; expected?: string } | null>(null);
   const [answer, setAnswer] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [plantAttacking, setPlantAttacking] = useState(false);
+  const [zombieDamaged, setZombieDamaged] = useState(false);
+  const [playerDamaged, setPlayerDamaged] = useState(false);
+  const [showProjectile, setShowProjectile] = useState(false);
+  const [showStars, setShowStars] = useState(false);
+  const [encouragingMsg, setEncouragingMsg] = useState('');
   const playSound = useFeedbackSound(settings.audio);
 
   useEffect(() => {
@@ -30,11 +48,35 @@ export const PlayPage = () => {
     const unsubQuestion = Game.on('question', (next) => {
       setQuestion(next);
       setAnswer('');
+      setFeedback(null); // Clear feedback when moving to next question
     });
     const unsubUpdate = Game.on('update', (snap) => setSnapshot(snap));
     const unsubFeedback = Game.on('feedback', (fb) => {
       setFeedback(fb);
       playSound(fb.correct ? 'success' : 'error');
+      
+      // Trigger animations
+      if (fb.correct) {
+        const randomMsg = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
+        setEncouragingMsg(randomMsg);
+        setPlantAttacking(true);
+        setShowProjectile(true);
+        setShowStars(true);
+        setTimeout(() => {
+          setZombieDamaged(true);
+          setShowProjectile(false);
+        }, 300);
+        setTimeout(() => {
+          setPlantAttacking(false);
+          setZombieDamaged(false);
+          setShowStars(false);
+        }, 1000);
+      } else {
+        setPlayerDamaged(true);
+        setTimeout(() => {
+          setPlayerDamaged(false);
+        }, 500);
+      }
     });
     const unsubFinish = Game.on('finish', (result) => {
       if (!level) return;
@@ -75,13 +117,56 @@ export const PlayPage = () => {
 
   const onSubmit = (evt: FormEvent) => {
     evt.preventDefault();
-    if (!answer.trim()) return;
+    if (!answer.trim() || state !== 'playing') return;
     Game.submit(answer);
+    setFeedback(null);
   };
+
+  const handleNumberClick = useCallback((num: string) => {
+    if (state !== 'playing') return;
+    setAnswer((prev) => prev + num);
+  }, [state]);
+
+  const handleDelete = useCallback(() => {
+    setAnswer((prev) => prev.slice(0, -1));
+  }, []);
+
+  const handleClear = useCallback(() => {
+    setAnswer('');
+  }, []);
+
+  const handleSubmit = useCallback(() => {
+    if (!answer.trim() || state !== 'playing') return;
+    Game.submit(answer);
+    setFeedback(null);
+  }, [answer, state]);
+
+  const handleExit = useCallback(() => {
+    if (showExitConfirm) {
+      Game.reset();
+      navigate('/levels');
+    } else {
+      setShowExitConfirm(true);
+      setTimeout(() => setShowExitConfirm(false), 3000);
+    }
+  }, [showExitConfirm, navigate]);
 
   return (
     <div className={`fade-in ${styles.wrapper}`}>
       <section className={`glass-card ${styles.panel}`}>
+        <div className={styles.controlButtons}>
+          <button className="btn secondary" onClick={() => navigate('/levels')}>
+            ⬅️ 返回关卡
+          </button>
+          <button 
+            className="btn secondary" 
+            onClick={handleExit}
+            style={{ background: showExitConfirm ? 'linear-gradient(135deg, #ef4444, #dc2626)' : undefined }}
+          >
+            {showExitConfirm ? '⚠️ 确认退出？' : '❌ 退出关卡'}
+          </button>
+        </div>
+
         <header className={styles.panelHeader}>
           <div>
             <span className="tag">{level.category}</span>
@@ -95,9 +180,24 @@ export const PlayPage = () => {
           </div>
         </header>
 
+        <div className={styles.battleField}>
+          <div className={`${styles.character} ${styles.plant} ${plantAttacking ? styles.attacking : ''} ${playerDamaged ? styles.damaged : ''}`}>
+            🌻
+          </div>
+          {showProjectile && <div className={styles.projectile}>🌰</div>}
+          <div className={`${styles.character} ${styles.zombie} ${zombieDamaged ? styles.damaged : ''}`}>
+            🧟
+          </div>
+        </div>
+
         <div className={styles.progressArea}>
+          {snapshot && snapshot.combo > 0 && (
+            <div className={`${styles.comboDisplay} ${snapshot.combo >= 5 ? styles.high : ''}`}>
+              🔥 连击 x{snapshot.combo} 🔥
+            </div>
+          )}
           <div className={styles.barGroup}>
-            <label>怪兽 HP</label>
+            <label>🧟 僵尸 HP</label>
             <div className={styles.progressBar}>
               <div
                 className={styles.barFill}
@@ -106,7 +206,7 @@ export const PlayPage = () => {
             </div>
           </div>
           <div className={styles.barGroup}>
-            <label>勇士 HP</label>
+            <label>🌻 植物 HP</label>
             <div className={styles.progressBar}>
               <div
                 className={`${styles.barFill} ${styles.player}`}
@@ -117,7 +217,8 @@ export const PlayPage = () => {
           <div className={styles.timer}>⏱️ {formatTime(snapshot?.timeLeft ?? level.timeSec)}</div>
         </div>
 
-        <div className={styles.questionArea}>
+        <div className={styles.questionArea} style={{ position: 'relative' }}>
+          {showStars && <div className={styles.stars}>⭐✨🌟</div>}
           {question ? (
             <div className={styles.questionCard}>
               <span className={styles.counter}>
@@ -134,26 +235,67 @@ export const PlayPage = () => {
                       : styles.feedbackPlain
                   }
                 >
-                  {feedback.correct ? '✅ 回答正确！' : `❌ 正确答案：${feedback.expected}`}
+                  {feedback.correct ? encouragingMsg : `❌ 正确答案：${feedback.expected}`}
                 </p>
               )}
             </div>
           ) : (
-            <div className={styles.questionCard}>加载题目中...</div>
+            <div className={styles.questionCard}>🎮 准备开始...</div>
           )}
         </div>
 
-        <form className={styles.answerForm} onSubmit={onSubmit}>
-          <input
-            value={answer}
-            onChange={(evt) => setAnswer(evt.target.value)}
-            placeholder="输入答案，按回车提交"
-            autoFocus
-          />
-          <button className="btn" type="submit">
-            提交
-          </button>
-        </form>
+        <div>
+          <div className={styles.answerForm}>
+            <input
+              value={answer}
+              onChange={(evt) => setAnswer(evt.target.value)}
+              placeholder="点击数字按钮或输入答案"
+              readOnly
+              style={{ textAlign: 'center', fontSize: '1.8rem' }}
+            />
+          </div>
+
+          <div className={styles.numberPad}>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+              <button
+                key={num}
+                className={styles.numButton}
+                onClick={() => handleNumberClick(num.toString())}
+                type="button"
+              >
+                {num}
+              </button>
+            ))}
+            <button
+              className={`${styles.numButton} ${styles.special}`}
+              onClick={() => handleNumberClick('-')}
+              type="button"
+            >
+              −
+            </button>
+            <button
+              className={styles.numButton}
+              onClick={() => handleNumberClick('0')}
+              type="button"
+            >
+              0
+            </button>
+            <button
+              className={`${styles.numButton} ${styles.delete}`}
+              onClick={handleDelete}
+              type="button"
+            >
+              ⌫
+            </button>
+            <button
+              className={`${styles.numButton} ${styles.submit}`}
+              onClick={handleSubmit}
+              type="button"
+            >
+              ✓ 提交答案
+            </button>
+          </div>
+        </div>
       </section>
     </div>
   );

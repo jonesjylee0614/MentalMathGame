@@ -7,21 +7,23 @@
 }
 
 .welcome {
-  font-size: 1rem;
-  color: rgba(191, 219, 254, 0.85);
+  font-size: 1.1rem;
+  color: #ea580c;
   margin-bottom: 8px;
+  font-weight: 600;
 }
 
 .hero h2 {
   font-size: 2.4rem;
   margin-bottom: 12px;
-  background: linear-gradient(90deg, #60a5fa, #a855f7);
+  background: linear-gradient(90deg, #f97316, #fb923c, #fbbf24);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .hero p {
-  color: rgba(226, 232, 240, 0.8);
+  color: #9a3412;
+  font-weight: 500;
 }
 
 .actions {
@@ -34,7 +36,8 @@
 .badges {
   display: grid;
   gap: 16px;
-  color: rgba(148, 163, 184, 0.85);
+  color: #9a3412;
+  font-weight: 500;
 }
 
 .sectionHeader {
@@ -50,7 +53,8 @@
 }
 
 .sectionHeader p {
-  color: rgba(148, 163, 184, 0.75);
+  color: #c2410c;
+  font-weight: 500;
 }
 
 .levelList {
@@ -63,9 +67,9 @@
   text-align: left;
   padding: 18px;
   border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: linear-gradient(135deg, rgba(30, 64, 175, 0.35), rgba(29, 78, 216, 0.1));
-  color: #e2e8f0;
+  border: 2px solid rgba(249, 115, 22, 0.3);
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), rgba(253, 186, 116, 0.15));
+  color: #7c2d12;
   cursor: pointer;
   display: grid;
   gap: 12px;
@@ -73,16 +77,18 @@
 }
 
 .levelItem:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 35px rgba(37, 99, 235, 0.4);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
+  border-color: rgba(249, 115, 22, 0.5);
 }
 
 .levelItem h4 {
   font-size: 1.1rem;
+  color: #9a3412;
 }
 
 .levelItem p {
-  color: rgba(226, 232, 240, 0.75);
+  color: #c2410c;
   font-size: 0.9rem;
 }
 
@@ -91,7 +97,8 @@
   flex-wrap: wrap;
   gap: 8px;
   font-size: 0.8rem;
-  color: rgba(148, 163, 184, 0.85);
+  color: #ea580c;
+  font-weight: 600;
 }
 
 .recentCard {
@@ -104,5 +111,6 @@
 .recentMeta {
   display: grid;
   gap: 8px;
-  color: rgba(148, 163, 184, 0.85);
+  color: #ea580c;
+  font-weight: 600;
 }

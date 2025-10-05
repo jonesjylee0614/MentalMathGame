@@ -17,16 +17,17 @@
 }
 
 .summary div {
-  padding: 16px;
+  padding: 18px;
   border-radius: 16px;
-  background: rgba(15, 23, 42, 0.45);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(135deg, rgba(254, 215, 170, 0.6), rgba(253, 186, 116, 0.4));
+  border: 2px solid rgba(249, 115, 22, 0.3);
 }
 
 .summary p {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.6rem;
+  font-weight: 800;
   margin-top: 8px;
+  color: #9a3412;
 }
 
 .actions {
