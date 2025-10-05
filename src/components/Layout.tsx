@@ -1,5 +1,5 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { PropsWithChildren, useMemo } from 'react';
+import { PropsWithChildren, useMemo, useState } from 'react';
 import { useGame } from '../context/GameContext';
 import styles from '../styles/Layout.module.css';
 
@@ -14,6 +14,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
   const { profile, stats, settings } = useGame();
   const location = useLocation();
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(false);
 
   const subtitle = useMemo(() => {
     if (location.pathname.startsWith('/levels')) return '选择一场新的冒险';
@@ -24,6 +25,11 @@ export const Layout = ({ children }: PropsWithChildren) => {
   }, [location.pathname]);
 
   const shellClass = settings.colorblind ? `${styles.shell} ${styles.colorblind}` : styles.shell;
+
+  const handleMenuClick = (path: string) => {
+    navigate(path);
+    setShowMenu(false);
+  };
 
   return (
     <div className={shellClass} style={{ fontSize: `${settings.fontScale}rem` }}>
