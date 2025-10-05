@@ -39,14 +39,15 @@ export const PlayPage = () => {
   const [encouragingMsg, setEncouragingMsg] = useState('');
   const [showBullet, setShowBullet] = useState(false);
   const [showZombieBullet, setShowZombieBullet] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const playSound = useFeedbackSound(settings.audio);
 
   const handleNumberClick = useCallback(
     (num: string) => {
-      if (state !== 'playing') return;
+      if (state !== 'playing' || isSubmitting) return;
       setAnswer((prev) => prev + num);
     },
-    [state]
+    [state, isSubmitting]
   );
 
   const handleDelete = useCallback(() => {
@@ -58,10 +59,11 @@ export const PlayPage = () => {
   }, []);
 
   const handleSubmit = useCallback(() => {
-    if (!answer.trim() || state !== 'playing') return;
+    if (!answer.trim() || state !== 'playing' || isSubmitting) return;
+    setIsSubmitting(true);
     Game.submit(answer);
     setFeedback(null);
-  }, [answer, state]);
+  }, [answer, state, isSubmitting]);
 
   useEffect(() => {
     if (!level) {
@@ -116,6 +118,7 @@ export const PlayPage = () => {
       // Clear answer after a short delay to let user see the result
       setTimeout(() => {
         setAnswer('');
+        setIsSubmitting(false); // 重置提交状态，允许下一题输入
       }, 800);
 
       // Trigger animations
@@ -375,13 +378,17 @@ export const PlayPage = () => {
                     key={key}
                     type={type}
                     onClick={(evt) => {
+                      evt.preventDefault(); // 阻止所有按钮的默认行为
                       if (type === 'submit') {
-                        evt.preventDefault();
-                        if (!answer.trim() || state !== 'playing') return;
+                        // 提交按钮：检查答案和状态
+                        if (!answer.trim() || state !== 'playing' || isSubmitting) return;
+                      } else {
+                        // 数字/操作按钮：如果正在提交中则禁止输入
+                        if (isSubmitting) return;
                       }
                       onPress();
                     }}
-                    disabled={type === 'submit' && (!answer.trim() || state !== 'playing')}
+                    disabled={type === 'submit' && (!answer.trim() || state !== 'playing' || isSubmitting)}
                     className={classes}
                   >
                     {label}
