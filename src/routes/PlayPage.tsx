@@ -153,150 +153,177 @@ export const PlayPage = () => {
 
   return (
     <div className={`fade-in ${styles.wrapper}`}>
-      <section className={`glass-card ${styles.panel}`}>
-        <div className={styles.controlButtons}>
-          <button className="btn secondary" onClick={() => navigate('/levels')}>
-            ⬅️ 返回关卡
-          </button>
-          <button 
-            className="btn secondary" 
-            onClick={handleExit}
-            style={{ background: showExitConfirm ? 'linear-gradient(135deg, #ef4444, #dc2626)' : undefined }}
-          >
-            {showExitConfirm ? '⚠️ 确认退出？' : '❌ 退出关卡'}
-          </button>
-        </div>
-
-        <header className={styles.panelHeader}>
-          <div>
-            <span className="tag">{level.category}</span>
-            <h2>{level.name}</h2>
-            <p>{level.desc}</p>
-          </div>
-          <div className={styles.meta}>
-            <span>题量 {level.count}</span>
-            <span>时限 {level.timeSec}s</span>
-            <span>难度 {level.difficulty.toFixed(1)}</span>
-          </div>
-        </header>
-
-        <div className={styles.battleField}>
-          <div className={`${styles.character} ${styles.plant} ${plantAttacking ? styles.attacking : ''} ${playerDamaged ? styles.damaged : ''}`}>
-            🌻
-          </div>
-          {showProjectile && <div className={styles.projectile}>🌰</div>}
-          <div className={`${styles.character} ${styles.zombie} ${zombieDamaged ? styles.damaged : ''}`}>
-            🧟
-          </div>
-        </div>
-
-        <div className={styles.progressArea}>
-          {snapshot && snapshot.combo > 0 && (
-            <div className={`${styles.comboDisplay} ${snapshot.combo >= 5 ? styles.high : ''}`}>
-              🔥 连击 x{snapshot.combo} 🔥
-            </div>
-          )}
-          <div className={styles.barGroup}>
-            <label>🧟 僵尸 HP</label>
-            <div className={styles.progressBar}>
-              <div
-                className={styles.barFill}
-                style={{ width: `${((snapshot?.hp.monster ?? level.hp?.monster ?? 100) / (snapshot?.hpMax.monster ?? level.hp?.monster ?? 100)) * 100}%` }}
-              />
-            </div>
-          </div>
-          <div className={styles.barGroup}>
-            <label>🌻 植物 HP</label>
-            <div className={styles.progressBar}>
-              <div
-                className={`${styles.barFill} ${styles.player}`}
-                style={{ width: `${((snapshot?.hp.player ?? level.hp?.player ?? 100) / (snapshot?.hpMax.player ?? level.hp?.player ?? 100)) * 100}%` }}
-              />
-            </div>
-          </div>
-          <div className={styles.timer}>⏱️ {formatTime(snapshot?.timeLeft ?? level.timeSec)}</div>
-        </div>
-
-        <div className={styles.questionArea} style={{ position: 'relative' }}>
-          {showStars && <div className={styles.stars}>⭐✨🌟</div>}
-          {question ? (
-            <div className={styles.questionCard}>
-              <span className={styles.counter}>
-                第 {snapshot ? snapshot.questionIndex + 1 : 1}/{snapshot ? snapshot.questionTotal : level.count} 题
-              </span>
-              <p className={styles.questionText}>{question.text}</p>
-              {feedback && (
-                <p
-                  className={
-                    feedback.correct
-                      ? styles.feedbackOk
-                      : settings.shake
-                      ? styles.feedbackNg
-                      : styles.feedbackPlain
-                  }
-                >
-                  {feedback.correct ? encouragingMsg : `❌ 正确答案：${feedback.expected}`}
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className={styles.questionCard}>🎮 准备开始...</div>
-          )}
-        </div>
-
-        <div>
-          <div className={styles.answerForm}>
-            <input
-              value={answer}
-              onChange={(evt) => setAnswer(evt.target.value)}
-              placeholder="点击数字按钮或输入答案"
-              readOnly
-              style={{ textAlign: 'center', fontSize: '1.8rem' }}
-            />
-          </div>
-
-          <div className={styles.numberPad}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-              <button
-                key={num}
-                className={styles.numButton}
-                onClick={() => handleNumberClick(num.toString())}
-                type="button"
-              >
-                {num}
+      <div className={styles.panel}>
+        {/* Left Section - Question and Answer Area */}
+        <div className={styles.leftSection}>
+          <div className={`glass-card`}>
+            <div className={styles.controlButtons}>
+              <button className="btn secondary" onClick={() => navigate('/levels')}>
+                ⬅️ 返回关卡
               </button>
-            ))}
-            <button
-              className={`${styles.numButton} ${styles.special}`}
-              onClick={() => handleNumberClick('-')}
-              type="button"
-            >
-              −
-            </button>
-            <button
-              className={styles.numButton}
-              onClick={() => handleNumberClick('0')}
-              type="button"
-            >
-              0
-            </button>
-            <button
-              className={`${styles.numButton} ${styles.delete}`}
-              onClick={handleDelete}
-              type="button"
-            >
-              ⌫
-            </button>
-            <button
-              className={`${styles.numButton} ${styles.submit}`}
-              onClick={handleSubmit}
-              type="button"
-            >
-              ✓ 提交答案
-            </button>
+              <button 
+                className="btn secondary" 
+                onClick={handleExit}
+                style={{ background: showExitConfirm ? 'linear-gradient(135deg, #ef4444, #dc2626)' : undefined }}
+              >
+                {showExitConfirm ? '⚠️ 确认退出？' : '❌ 退出关卡'}
+              </button>
+            </div>
+
+            <header className={styles.panelHeader}>
+              <div>
+                <span className="tag">{level.category}</span>
+                <h2>{level.name}</h2>
+                <p>{level.desc}</p>
+              </div>
+              <div className={styles.meta}>
+                <span>题量 {level.count}</span>
+                <span>时限 {level.timeSec}s</span>
+                <span>难度 {level.difficulty.toFixed(1)}</span>
+              </div>
+            </header>
+          </div>
+
+          <div className={`glass-card ${styles.questionArea}`} style={{ position: 'relative' }}>
+            {showStars && <div className={styles.stars}>⭐✨🌟</div>}
+            {question ? (
+              <div className={styles.questionCard}>
+                <span className={styles.counter}>
+                  第 {snapshot ? snapshot.questionIndex + 1 : 1}/{snapshot ? snapshot.questionTotal : level.count} 题
+                </span>
+                <p className={styles.questionText}>{question.text}</p>
+                {feedback && (
+                  <p
+                    className={
+                      feedback.correct
+                        ? styles.feedbackOk
+                        : settings.shake
+                        ? styles.feedbackNg
+                        : styles.feedbackPlain
+                    }
+                  >
+                    {feedback.correct ? encouragingMsg : `❌ 正确答案：${feedback.expected}`}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className={styles.questionCard}>🎮 准备开始...</div>
+            )}
+          </div>
+
+          <div className={`glass-card`}>
+            <div className={styles.answerForm}>
+              <input
+                value={answer}
+                onChange={(evt) => setAnswer(evt.target.value)}
+                placeholder="请输入答案"
+                readOnly
+                style={{ textAlign: 'center' }}
+              />
+              <div className={styles.numberPad}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                  <button
+                    key={num}
+                    className={styles.numButton}
+                    onClick={() => handleNumberClick(num.toString())}
+                    type="button"
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button
+                  className={`${styles.numButton} ${styles.special}`}
+                  onClick={() => handleNumberClick('-')}
+                  type="button"
+                >
+                  −
+                </button>
+                <button
+                  className={styles.numButton}
+                  onClick={() => handleNumberClick('0')}
+                  type="button"
+                >
+                  0
+                </button>
+                <button
+                  className={`${styles.numButton} ${styles.delete}`}
+                  onClick={handleDelete}
+                  type="button"
+                >
+                  ⌫
+                </button>
+                <button
+                  className={`${styles.numButton} ${styles.submit}`}
+                  onClick={handleSubmit}
+                  type="button"
+                >
+                  ✓ 提交答案
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+
+        {/* Right Section - Battle Animation and Stats */}
+        <div className={styles.rightSection}>
+          <div className={`glass-card`}>
+            <div className={styles.battleField}>
+              <div className={styles.characterWrapper}>
+                <div className={styles.hpBar}>
+                  <div
+                    className={`${styles.hpFill} ${styles.player}`}
+                    style={{ width: `${((snapshot?.hp.player ?? level.hp?.player ?? 100) / (snapshot?.hpMax.player ?? level.hp?.player ?? 100)) * 100}%` }}
+                  />
+                </div>
+                <div className={`${styles.character} ${styles.plant} ${plantAttacking ? styles.attacking : ''} ${playerDamaged ? styles.damaged : ''}`}>
+                  🌻
+                </div>
+              </div>
+              {showProjectile && <div className={styles.projectile}>🌰</div>}
+              <div className={styles.characterWrapper}>
+                <div className={styles.hpBar}>
+                  <div
+                    className={`${styles.hpFill} ${styles.monster}`}
+                    style={{ width: `${((snapshot?.hp.monster ?? level.hp?.monster ?? 100) / (snapshot?.hpMax.monster ?? level.hp?.monster ?? 100)) * 100}%` }}
+                  />
+                </div>
+                <div className={`${styles.character} ${styles.zombie} ${zombieDamaged ? styles.damaged : ''}`}>
+                  🧟
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={`glass-card`}>
+            <div className={styles.statsArea}>
+              <div className={styles.timer}>
+                ⏱️ {formatTime(snapshot?.timeLeft ?? level.timeSec)}
+              </div>
+              {snapshot && snapshot.combo > 0 && (
+                <div className={`${styles.comboDisplay} ${snapshot.combo >= 5 ? styles.high : ''}`}>
+                  🔥 连击 x{snapshot.combo} 🔥
+                </div>
+              )}
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>当前题目</span>
+                <span className={styles.statValue}>
+                  {snapshot ? snapshot.questionIndex + 1 : 1} / {snapshot ? snapshot.questionTotal : level.count}
+                </span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>正确率</span>
+                <span className={styles.statValue}>
+                  {snapshot ? Math.round((snapshot.correctCount / Math.max(1, snapshot.questionIndex)) * 100) : 0}%
+                </span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>当前得分</span>
+                <span className={styles.statValue}>{snapshot?.score ?? 0}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

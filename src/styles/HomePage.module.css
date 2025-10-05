@@ -1,116 +1,162 @@
 .hero {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 32px;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 40px;
   align-items: center;
   overflow: visible;
+  padding: 32px;
 }
 
 .welcome {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: #ea580c;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   font-weight: 600;
 }
 
 .hero h2 {
-  font-size: 2.4rem;
-  margin-bottom: 12px;
+  font-size: 2.8rem;
+  margin-bottom: 16px;
   background: linear-gradient(90deg, #f97316, #fb923c, #fbbf24);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  font-weight: 800;
 }
 
 .hero p {
   color: #9a3412;
   font-weight: 500;
+  font-size: 1.05rem;
+  line-height: 1.6;
 }
 
 .actions {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
 }
 
 .badges {
   display: grid;
-  gap: 16px;
+  gap: 20px;
   color: #9a3412;
   font-weight: 500;
+}
+
+.badges > div {
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(251, 146, 60, 0.15);
+  border: 2px solid rgba(249, 115, 22, 0.25);
 }
 
 .sectionHeader {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .sectionHeader h3 {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
+  font-weight: 700;
 }
 
 .sectionHeader p {
   color: #c2410c;
   font-weight: 500;
+  font-size: 0.95rem;
 }
 
 .levelList {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
 }
 
 .levelItem {
   text-align: left;
-  padding: 18px;
-  border-radius: 16px;
+  padding: 24px;
+  border-radius: 18px;
   border: 2px solid rgba(249, 115, 22, 0.3);
   background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), rgba(253, 186, 116, 0.15));
   color: #7c2d12;
   cursor: pointer;
   display: grid;
-  gap: 12px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  gap: 14px;
+  transition: all 0.3s ease;
 }
 
 .levelItem:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
-  border-color: rgba(249, 115, 22, 0.5);
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 12px 30px rgba(249, 115, 22, 0.35);
+  border-color: rgba(249, 115, 22, 0.6);
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.25), rgba(253, 186, 116, 0.2));
 }
 
 .levelItem h4 {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: #9a3412;
+  font-weight: 700;
 }
 
 .levelItem p {
   color: #c2410c;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
 .levelMeta {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  font-size: 0.8rem;
+  gap: 10px;
+  font-size: 0.82rem;
   color: #ea580c;
   font-weight: 600;
 }
 
 .recentCard {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   align-items: center;
-  gap: 18px;
+  gap: 24px;
+  padding: 24px;
+}
+
+.recentCard h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
 }
 
 .recentMeta {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   color: #ea580c;
   font-weight: 600;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 24px;
+  }
+
+  .hero h2 {
+    font-size: 2.2rem;
+  }
+
+  .levelList {
+    grid-template-columns: 1fr;
+  }
+
+  .recentCard {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
 }

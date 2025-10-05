@@ -52,6 +52,18 @@ export const Layout = ({ children }: PropsWithChildren) => {
           <p className={styles.subtitle}>{subtitle}</p>
         </header>
         <div className={styles.content}>{children}</div>
+        <nav className={styles.mobileNav}>
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) => (isActive ? `${styles.mobileNavItem} ${styles.active}` : styles.mobileNavItem)}
+            >
+              <span className={styles.mobileNavIcon}>{link.label.split(' ')[0]}</span>
+              <span>{link.label.split(' ')[1]}</span>
+            </NavLink>
+          ))}
+        </nav>
       </main>
     </div>
   );
