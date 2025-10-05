@@ -191,24 +191,28 @@
 
 .bullet {
   position: absolute;
-  left: 20%;
+  left: 15%;
   top: 50%;
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  animation: bulletFly 0.5s ease-out forwards;
+  font-size: clamp(2rem, 4vw, 3rem);
+  animation: bulletFly 0.6s linear forwards;
   z-index: 5;
   pointer-events: none;
-  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 0 10px rgba(34, 197, 94, 1)) 
+          drop-shadow(0 0 20px rgba(34, 197, 94, 0.5))
+          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .zombieBullet {
   position: absolute;
-  right: 20%;
+  right: 15%;
   top: 50%;
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  animation: zombieBulletFly 0.5s ease-out forwards;
+  font-size: clamp(2rem, 4vw, 3rem);
+  animation: zombieBulletFly 0.6s linear forwards;
   z-index: 5;
   pointer-events: none;
-  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 0 10px rgba(234, 88, 12, 1)) 
+          drop-shadow(0 0 20px rgba(234, 88, 12, 0.5))
+          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .comboBadge {
@@ -671,27 +675,37 @@
 
 @keyframes bulletFly {
   0% {
-    left: 20%;
+    left: 15%;
     opacity: 1;
-    transform: translateY(-50%) scale(0.5);
+    transform: translateY(-50%) scale(0.8);
+  }
+  80% {
+    left: 80%;
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
   }
   100% {
-    left: 75%;
+    left: 85%;
     opacity: 0;
-    transform: translateY(-50%) scale(1.5);
+    transform: translateY(-50%) scale(1.2);
   }
 }
 
 @keyframes zombieBulletFly {
   0% {
-    right: 20%;
+    right: 15%;
     opacity: 1;
-    transform: translateY(-50%) scale(0.5);
+    transform: translateY(-50%) scale(0.8) scaleX(-1);
+  }
+  80% {
+    right: 80%;
+    opacity: 1;
+    transform: translateY(-50%) scale(1) scaleX(-1);
   }
   100% {
-    right: 75%;
+    right: 85%;
     opacity: 0;
-    transform: translateY(-50%) scale(1.5);
+    transform: translateY(-50%) scale(1.2) scaleX(-1);
   }
 }
 

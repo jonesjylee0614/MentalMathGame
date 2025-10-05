@@ -320,10 +320,10 @@ export const PlayPage = () => {
           </div>
 
           {bullets.map((id) => (
-            <div key={id} className={styles.bullet}>💥</div>
+            <div key={id} className={styles.bullet}>🟢</div>
           ))}
           {zombieBullets.map((id) => (
-            <div key={id} className={styles.zombieBullet}>💢</div>
+            <div key={id} className={styles.zombieBullet}>🟤</div>
           ))}
 
           {snapshot && snapshot.combo > 0 && (
