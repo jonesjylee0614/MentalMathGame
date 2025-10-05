@@ -134,11 +134,7 @@ export const PlayPage = () => {
         // 连续发射5个子弹，慢慢飞
         [0, 1, 2, 3, 4].forEach((i) => {
           setTimeout(() => {
-            setBullets((prev) => {
-              const newBullets = [...prev, Date.now() + i];
-              console.log('Firing plant bullet:', newBullets.length, 'bullets');
-              return newBullets;
-            });
+            setBullets((prev) => [...prev, Date.now() + i]);
           }, i * 200); // 每200ms发射一个
         });
         
@@ -158,11 +154,7 @@ export const PlayPage = () => {
         // 连续发射4个僵尸子弹
         [0, 1, 2, 3].forEach((i) => {
           setTimeout(() => {
-            setZombieBullets((prev) => {
-              const newBullets = [...prev, Date.now() + i];
-              console.log('Firing zombie bullet:', newBullets.length, 'bullets');
-              return newBullets;
-            });
+            setZombieBullets((prev) => [...prev, Date.now() + i]);
           }, i * 180); // 每180ms发射一个
         });
         
@@ -394,14 +386,12 @@ export const PlayPage = () => {
             <span className={`${styles.characterIcon} ${plantAttacking ? styles.attacking : ''}`}>🌻</span>
           </div>
 
-          {bullets.map((id) => {
-            console.log('Rendering bullet:', id);
-            return <div key={id} className={styles.bullet}>🟢</div>;
-          })}
-          {zombieBullets.map((id) => {
-            console.log('Rendering zombie bullet:', id);
-            return <div key={id} className={styles.zombieBullet}>🟤</div>;
-          })}
+          {bullets.map((id) => (
+            <div key={id} className={styles.bullet}>🟢</div>
+          ))}
+          {zombieBullets.map((id) => (
+            <div key={id} className={styles.zombieBullet}>🟤</div>
+          ))}
 
           {snapshot && snapshot.combo > 0 && (
             <div className={styles.comboBadge}>
