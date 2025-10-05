@@ -21,10 +21,33 @@ export const ResultPage = () => {
     );
   }
 
+  const isVictory = lastResult.outcome === 'victory';
+  const isDefeat = lastResult.outcome === 'defeat' || lastResult.outcome === 'timeout';
+
   return (
     <div className="fade-in">
-      <section className={`glass-card ${styles.card}`}>
-        <h2>{level?.name ?? lastResult.levelName ?? '挑战结果'}</h2>
+      <section className={`glass-card ${styles.card} ${isVictory ? styles.victory : ''} ${isDefeat ? styles.defeat : ''}`}>
+        <div className={styles.resultHeader}>
+          {isVictory && (
+            <div className={styles.victoryBanner}>
+              <div className={styles.trophy}>🏆</div>
+              <h2 className={styles.victoryTitle}>胜利！</h2>
+              <p className={styles.victorySubtitle}>太棒了！你成功击败了僵尸！</p>
+            </div>
+          )}
+          {isDefeat && (
+            <div className={styles.defeatBanner}>
+              <div className={styles.defeatIcon}>😢</div>
+              <h2 className={styles.defeatTitle}>失败了</h2>
+              <p className={styles.defeatSubtitle}>
+                {lastResult.outcome === 'timeout' ? '时间耗尽了，再接再厉！' : '被僵尸打败了，下次加油！'}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <h3 className={styles.levelName}>{level?.name ?? lastResult.levelName ?? '挑战结果'}</h3>
+
         <div className={styles.summary}>
           <div>
             <span className="tag">得分</span>

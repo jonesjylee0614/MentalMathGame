@@ -45,6 +45,40 @@ export const PlayPage = () => {
       setError('未找到关卡，返回关卡列表');
       return;
     }
+
+    // Keyboard shortcuts
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (state !== 'playing') return;
+      
+      // Number keys (0-9) and numpad
+      if (e.key >= '0' && e.key <= '9') {
+        handleNumberClick(e.key);
+        e.preventDefault();
+      }
+      // Enter key for submit
+      else if (e.key === 'Enter' && answer.trim()) {
+        handleSubmit();
+        e.preventDefault();
+      }
+      // Backspace for delete
+      else if (e.key === 'Backspace') {
+        handleDelete();
+        e.preventDefault();
+      }
+      // Escape for clear
+      else if (e.key === 'Escape') {
+        handleClear();
+        e.preventDefault();
+      }
+      // Minus key
+      else if (e.key === '-') {
+        handleNumberClick('-');
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
     const unsubState = Game.on('statechange', ({ state: nextState }) => setState(nextState));
     const unsubQuestion = Game.on('question', (next) => {
       setQuestion(next);
@@ -100,6 +134,7 @@ export const PlayPage = () => {
     setError(null);
 
     return () => {
+      window.removeEventListener('keydown', handleKeyDown);
       unsubState();
       unsubQuestion();
       unsubUpdate();
@@ -107,7 +142,7 @@ export const PlayPage = () => {
       unsubFinish();
       Game.reset();
     };
-  }, [level, navigate, playSound, recordResult, setLastResult]);
+  }, [level, navigate, playSound, recordResult, setLastResult, state, answer, handleNumberClick, handleSubmit, handleDelete, handleClear]);
 
   if (!level) {
     return (
@@ -274,7 +309,7 @@ export const PlayPage = () => {
           <div className={`glass-card`}>
             <div className={styles.battleField}>
               <div className={styles.characterWrapper}>
-                <div className={styles.hpBar}>
+                <div className={`${styles.hpBar} ${((snapshot?.hp.player ?? level.hp?.player ?? 100) / (snapshot?.hpMax.player ?? level.hp?.player ?? 100)) <= 0.3 ? styles.lowHp : ''}`}>
                   <div
                     className={`${styles.hpFill} ${styles.player}`}
                     style={{ width: `${((snapshot?.hp.player ?? level.hp?.player ?? 100) / (snapshot?.hpMax.player ?? level.hp?.player ?? 100)) * 100}%` }}
@@ -286,7 +321,7 @@ export const PlayPage = () => {
               </div>
               {showProjectile && <div className={styles.projectile}>🌰</div>}
               <div className={styles.characterWrapper}>
-                <div className={styles.hpBar}>
+                <div className={`${styles.hpBar} ${((snapshot?.hp.monster ?? level.hp?.monster ?? 100) / (snapshot?.hpMax.monster ?? level.hp?.monster ?? 100)) <= 0.3 ? styles.lowHp : ''}`}>
                   <div
                     className={`${styles.hpFill} ${styles.monster}`}
                     style={{ width: `${((snapshot?.hp.monster ?? level.hp?.monster ?? 100) / (snapshot?.hpMax.monster ?? level.hp?.monster ?? 100)) * 100}%` }}
@@ -301,11 +336,11 @@ export const PlayPage = () => {
 
           <div className={`glass-card`}>
             <div className={styles.statsArea}>
-              <div className={styles.timer}>
+              <div className={`${styles.timer} ${(snapshot?.timeLeft ?? level.timeSec) <= 10 ? styles.warning : ''}`}>
                 ⏱️ {formatTime(snapshot?.timeLeft ?? level.timeSec)}
               </div>
               {snapshot && snapshot.combo > 0 && (
-                <div className={`${styles.comboDisplay} ${snapshot.combo >= 5 ? styles.high : ''}`}>
+                <div className={`${styles.comboDisplay} ${snapshot.combo >= 10 ? styles.ultra : snapshot.combo >= 5 ? styles.high : ''}`}>
                   🔥 连击 x{snapshot.combo} 🔥
                 </div>
               )}
