@@ -1,0 +1,58 @@
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { PropsWithChildren, useMemo } from 'react';
+import { useGame } from '../context/GameContext';
+import styles from '../styles/Layout.module.css';
+
+const links = [
+  { to: '/', label: '🏠 首页' },
+  { to: '/levels', label: '🧩 关卡' },
+  { to: '/stats', label: '📊 统计' },
+  { to: '/settings', label: '⚙️ 设置' }
+];
+
+export const Layout = ({ children }: PropsWithChildren) => {
+  const { profile, stats, settings } = useGame();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const subtitle = useMemo(() => {
+    if (location.pathname.startsWith('/levels')) return '选择一场新的冒险';
+    if (location.pathname.startsWith('/stats')) return '回顾你的战绩';
+    if (location.pathname.startsWith('/settings')) return '调校战斗准备';
+    if (location.pathname.startsWith('/play')) return '迎战心算怪兽';
+    return '欢迎回到心算勇士殿堂';
+  }, [location.pathname]);
+
+  const shellClass = settings.colorblind ? `${styles.shell} ${styles.colorblind}` : styles.shell;
+
+  return (
+    <div className={shellClass} style={{ fontSize: `${settings.fontScale}rem` }}>
+      <aside className={styles.sidebar}>
+        <div className={styles.brand} onClick={() => navigate('/')}>🧠 心算勇士</div>
+        <div className={styles.profileCard}>
+          <p className={styles.profileName}>{profile.name}</p>
+          <p className={styles.profileMeta}>累计积分 {stats.totalScore}</p>
+        </div>
+        <nav className={styles.nav}>
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) => (isActive ? `${styles.navItem} ${styles.active}` : styles.navItem)}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
+        <div className={styles.sidebarGlow} />
+      </aside>
+      <main className={styles.main}>
+        <header className={styles.header}>
+          <h1 className={styles.title}>Mental Math Arena</h1>
+          <p className={styles.subtitle}>{subtitle}</p>
+        </header>
+        <div className={styles.content}>{children}</div>
+      </main>
+    </div>
+  );
+};

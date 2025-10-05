@@ -1,4 +1,6 @@
-export const LEVELS = [
+import { Level } from './types';
+
+export const LEVELS: Level[] = [
   // 基础入门：5 内与 10 内
   { id: 'add_1_5', category: '基础入门', name: '5以内的加法', desc: '例：2+3=?', generator: { type: 'addsub', ops: ['+'], max: 5 }, count: 20, timeSec: 60, difficulty: 1.0 },
   { id: 'sub_1_5', category: '基础入门', name: '5以内的减法', desc: '例：4-2=?', generator: { type: 'addsub', ops: ['-'], max: 5 }, count: 20, timeSec: 60, difficulty: 1.0 },
@@ -73,16 +75,16 @@ export const LEVELS = [
   { id: 'unit_time', category: '进阶拓展', name: '时间单位换算', desc: '1分19秒=?秒', generator: { type: 'unitConv', subtype: 'time' }, count: 20, timeSec: 130, difficulty: 1.7 },
   { id: 'time_compare', category: '进阶拓展', name: '时间大小比较', desc: '50秒 ? 4分', generator: { type: 'compare', subtype: 'time' }, count: 20, timeSec: 110, difficulty: 1.7 },
   { id: 'div_remainder', category: '进阶拓展', name: '有余数的除法', desc: '11÷6=?余?', generator: { type: 'divRemainder', dividendMax: 50, divisorMax: 9 }, count: 20, timeSec: 140, difficulty: 2.1 },
-  { id: 'paren_mix', category: '挑战进阶', name: '含小括号的混合运算', desc: '(79-76)×8', generator: { type: 'parenMix' }, count: 20, timeSec: 150, difficulty: 2.3 },
+  { id: 'paren_mix', category: '挑战进阶', name: '含小括号的混合运算', desc: '(79-76)×8', generator: { type: 'parenMix' }, count: 20, timeSec: 150, difficulty: 2.3 }
 ];
 
-export const findLevel = (levelId) => LEVELS.find((level) => level.id === levelId) || null;
+export const findLevel = (levelId: string) => LEVELS.find((level) => level.id === levelId) ?? null;
 
 export const listCategories = () => {
-  const map = new Map();
+  const map = new Map<string, Level[]>();
   LEVELS.forEach((level) => {
     if (!map.has(level.category)) map.set(level.category, []);
-    map.get(level.category).push(level);
+    map.get(level.category)!.push(level);
   });
   return Array.from(map.entries()).map(([name, items]) => ({ name, items }));
 };
