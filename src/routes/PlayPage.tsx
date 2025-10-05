@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { CSSProperties, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { Game } from '../lib/engine';
@@ -35,7 +35,6 @@ export const PlayPage = () => {
   const [zombieAttacking, setZombieAttacking] = useState(false);
   const [zombieDamaged, setZombieDamaged] = useState(false);
   const [playerDamaged, setPlayerDamaged] = useState(false);
-  const [showProjectile, setShowProjectile] = useState(false);
   const [showStars, setShowStars] = useState(false);
   const [encouragingMsg, setEncouragingMsg] = useState('');
   const playSound = useFeedbackSound(settings.audio);
@@ -117,12 +116,10 @@ export const PlayPage = () => {
         const randomMsg = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
         setEncouragingMsg(randomMsg);
         setPlantAttacking(true);
-        setShowProjectile(true);
         setShowStars(true);
         setTimeout(() => {
           setZombieDamaged(true);
-          setShowProjectile(false);
-        }, 300);
+        }, 260);
         setTimeout(() => {
           setPlantAttacking(false);
           setZombieDamaged(false);
@@ -192,188 +189,211 @@ export const PlayPage = () => {
     }
   }, [showExitConfirm, navigate]);
 
+  const totalQuestions = snapshot?.questionTotal ?? level.count;
+  const currentQuestion = snapshot ? snapshot.questionIndex + 1 : question ? 1 : 0;
+  const answeredQuestions = snapshot?.questionIndex ?? 0;
+  const progressPercent = totalQuestions > 0 ? Math.min(100, (answeredQuestions / totalQuestions) * 100) : 0;
+  const timeLeft = snapshot?.timeLeft ?? level.timeSec;
+  const timeTotal = snapshot?.timeTotal ?? level.timeSec;
+  const playerHp = snapshot?.hp.player ?? level.hp?.player ?? 100;
+  const playerHpMax = snapshot?.hpMax.player ?? level.hp?.player ?? 100;
+  const monsterHp = snapshot?.hp.monster ?? level.hp?.monster ?? 100;
+  const monsterHpMax = snapshot?.hpMax.monster ?? level.hp?.monster ?? 100;
+  const playerHpPercent = Math.max(0, Math.round((playerHp / playerHpMax) * 100));
+  const monsterHpPercent = Math.max(0, Math.round((monsterHp / monsterHpMax) * 100));
+  const accuracy = snapshot && snapshot.questionIndex > 0
+    ? Math.round((snapshot.correct / snapshot.questionIndex) * 100)
+    : snapshot?.correct
+    ? 100
+    : 0;
+  const timerAngle = timeTotal > 0 ? Math.round((Math.max(0, timeLeft) / timeTotal) * 360) : 360;
+
+  const keypadButtons: Array<
+    | { key: string; label: string; onPress: () => void; type?: 'button' | 'submit'; variant?: 'action' | 'submit'; span?: 'wide'; }
+  > = [
+    { key: '7', label: '7', onPress: () => handleNumberClick('7') },
+    { key: '8', label: '8', onPress: () => handleNumberClick('8') },
+    { key: '9', label: '9', onPress: () => handleNumberClick('9') },
+    { key: 'del', label: '⌫', onPress: handleDelete, variant: 'action' },
+    { key: '4', label: '4', onPress: () => handleNumberClick('4') },
+    { key: '5', label: '5', onPress: () => handleNumberClick('5') },
+    { key: '6', label: '6', onPress: () => handleNumberClick('6') },
+    { key: 'clear', label: '清空', onPress: handleClear, variant: 'action' },
+    { key: '1', label: '1', onPress: () => handleNumberClick('1') },
+    { key: '2', label: '2', onPress: () => handleNumberClick('2') },
+    { key: '3', label: '3', onPress: () => handleNumberClick('3') },
+    { key: 'minus', label: '−', onPress: () => handleNumberClick('-'), variant: 'action' },
+    { key: '0', label: '0', onPress: () => handleNumberClick('0'), span: 'wide' },
+    {
+      key: 'submit',
+      label: '✓ 提交',
+      onPress: handleSubmit,
+      type: 'submit',
+      variant: 'submit',
+      span: 'wide'
+    }
+  ];
+
   return (
     <div className={`fade-in ${styles.wrapper}`}>
-      <div className={styles.panel}>
-        {/* Left Section - Question and Answer Area */}
-        <div className={styles.leftSection}>
-          <div className={`glass-card`}>
-            <div className={styles.controlButtons}>
-              <button className="btn secondary" onClick={() => navigate('/levels')}>
-                ⬅️ 返回关卡
-              </button>
-              <button 
-                className="btn secondary" 
-                onClick={handleExit}
-                style={{ background: showExitConfirm ? 'linear-gradient(135deg, #ef4444, #dc2626)' : undefined }}
-              >
-                {showExitConfirm ? '⚠️ 确认退出？' : '❌ 退出关卡'}
-              </button>
-            </div>
-
-            <header className={styles.panelHeader}>
-              <div>
-                <span className="tag">{level.category}</span>
-                <h2>{level.name}</h2>
-                <p>{level.desc}</p>
-              </div>
-              <div className={styles.meta}>
-                <span>题量 {level.count}</span>
-                <span>时限 {level.timeSec}s</span>
-                <span>难度 {level.difficulty.toFixed(1)}</span>
-              </div>
-            </header>
+      <header className={`glass-card ${styles.topBar}`}>
+        <div className={styles.levelMeta}>
+          <div className={styles.levelText}>
+            <span className={styles.levelCategory}>🏁 当前关卡</span>
+            <h2>{level.name}</h2>
+            <p>{level.desc}</p>
           </div>
+          <div className={styles.levelProgress}>
+            <span>第 {currentQuestion || 1}/{totalQuestions} 题</span>
+            <div className={styles.progressTrack}>
+              <div className={styles.progressFill} style={{ width: `${progressPercent}%` }} />
+            </div>
+          </div>
+        </div>
+        <div
+          className={`${styles.timerOrb} ${timeLeft <= 10 ? styles.timerCritical : ''}`}
+          style={{ '--timer-angle': `${timerAngle}deg` } as CSSProperties}
+        >
+          <div className={styles.timerCore}>
+            <span className={styles.timerLabel}>剩余时间</span>
+            <strong>{formatTime(timeLeft)}</strong>
+          </div>
+        </div>
+      </header>
 
-          <div className={`glass-card ${styles.questionArea}`} style={{ position: 'relative' }}>
-            {showStars && <div className={styles.stars}>⭐✨🌟</div>}
+      <section className={`glass-card ${styles.energyPanel}`}>
+        <div className={styles.energyRow}>
+          <div className={styles.energyMeta}>
+            <span className={styles.energyIcon}>🌻</span>
+            <span className={styles.energyLabel}>我方能量</span>
+          </div>
+          <div
+            className={`${styles.energyBar} ${plantAttacking ? styles.energySurge : ''} ${playerDamaged ? styles.energyHit : ''}`}
+          >
+            <div className={styles.energyFill} style={{ width: `${playerHpPercent}%` }} />
+          </div>
+          <span className={styles.energyValue}>{playerHpPercent}%</span>
+        </div>
+        <div className={styles.energyRow}>
+          <div className={styles.energyMeta}>
+            <span className={styles.energyIcon}>👾</span>
+            <span className={styles.energyLabel}>怪兽能量</span>
+          </div>
+          <div
+            className={`${styles.energyBar} ${zombieAttacking ? styles.energySurge : ''} ${zombieDamaged ? styles.energyHit : ''}`}
+          >
+            <div className={`${styles.energyFill} ${styles.enemy}`} style={{ width: `${monsterHpPercent}%` }} />
+          </div>
+          <span className={styles.energyValue}>{monsterHpPercent}%</span>
+        </div>
+        {snapshot && snapshot.combo > 0 && (
+          <div className={styles.comboBanner}>
+            <span>🔥 连击 x{snapshot.combo}</span>
+          </div>
+        )}
+      </section>
+
+      <main className={styles.stage}>
+        <div className={`glass-card ${styles.questionPanel}`}>
+          {showStars && <div className={styles.starBurst} aria-hidden="true" />}
+          <div className={styles.questionHeader}>
+            <span className={styles.questionIndex}>第 {currentQuestion || 1} 题</span>
+            <span className={styles.questionGoal}>打败僵尸！</span>
+          </div>
+          <div className={styles.questionBody}>
             {question ? (
-              <div className={styles.questionCard}>
-                <span className={styles.counter}>
-                  第 {snapshot ? snapshot.questionIndex + 1 : 1}/{snapshot ? snapshot.questionTotal : level.count} 题
-                </span>
-                <p className={styles.questionText}>{question.text}</p>
-                {feedback && (
-                  <p
-                    className={
-                      feedback.correct
-                        ? styles.feedbackOk
-                        : settings.shake
-                        ? styles.feedbackNg
-                        : styles.feedbackPlain
-                    }
-                  >
-                    {feedback.correct ? encouragingMsg : `❌ 正确答案：${feedback.expected}`}
-                  </p>
-                )}
-              </div>
+              <p className={styles.questionText}>{question.text}</p>
             ) : (
-              <div className={styles.questionCard}>🎮 准备开始...</div>
+              <p className={styles.readyText}>🎮 准备开始...</p>
             )}
-          </div>
-
-          <div className={`glass-card`}>
-            <div className={styles.answerForm}>
-              <input
-                value={answer}
-                onChange={(evt) => setAnswer(evt.target.value)}
-                placeholder="请输入答案"
-                readOnly
-                style={{ textAlign: 'center' }}
-              />
-              <div className={styles.numberPad}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                  <button
-                    key={num}
-                    className={styles.numButton}
-                    onClick={() => handleNumberClick(num.toString())}
-                    type="button"
-                  >
-                    {num}
-                  </button>
-                ))}
-                <button
-                  className={`${styles.numButton} ${styles.special}`}
-                  onClick={() => handleNumberClick('-')}
-                  type="button"
-                >
-                  −
-                </button>
-                <button
-                  className={styles.numButton}
-                  onClick={() => handleNumberClick('0')}
-                  type="button"
-                >
-                  0
-                </button>
-                <button
-                  className={`${styles.numButton} ${styles.delete}`}
-                  onClick={handleDelete}
-                  type="button"
-                >
-                  ⌫
-                </button>
-                <button
-                  className={`${styles.numButton} ${styles.submit}`}
-                  onClick={handleSubmit}
-                  type="button"
-                >
-                  ✓ 提交答案
-                </button>
-              </div>
+            <div className={styles.answerWindow}>
+              <input value={answer} placeholder="输入答案" readOnly />
             </div>
           </div>
+          {feedback && (
+            <div
+              className={`${
+                feedback.correct
+                  ? styles.feedbackPositive
+                  : settings.shake
+                  ? styles.feedbackNegative
+                  : styles.feedbackNeutral
+              } ${styles.feedbackToast}`}
+            >
+              {feedback.correct ? encouragingMsg : `❌ 正确答案：${feedback.expected}`}
+            </div>
+          )}
         </div>
 
-        {/* Right Section - Battle Animation and Stats */}
-        <div className={styles.rightSection}>
-          <div className={`glass-card`}>
-            <div className={styles.battleField}>
-              <div className={styles.characterWrapper}>
-                <div className={`${styles.hpBar} ${((snapshot?.hp.player ?? level.hp?.player ?? 100) / (snapshot?.hpMax.player ?? level.hp?.player ?? 100)) <= 0.3 ? styles.lowHp : ''}`}>
-                  <div
-                    className={`${styles.hpFill} ${styles.player}`}
-                    style={{ width: `${((snapshot?.hp.player ?? level.hp?.player ?? 100) / (snapshot?.hpMax.player ?? level.hp?.player ?? 100)) * 100}%` }}
-                  />
-                </div>
-                <div className={`${styles.character} ${styles.plant} ${plantAttacking ? styles.attacking : ''} ${playerDamaged ? styles.damaged : ''}`}>
-                  🌻
-                </div>
-              </div>
-              {showProjectile && <div className={styles.projectile}>🌰</div>}
-              <div className={styles.characterWrapper}>
-                <div className={`${styles.hpBar} ${((snapshot?.hp.monster ?? level.hp?.monster ?? 100) / (snapshot?.hpMax.monster ?? level.hp?.monster ?? 100)) <= 0.3 ? styles.lowHp : ''}`}>
-                  <div
-                    className={`${styles.hpFill} ${styles.monster}`}
-                    style={{ width: `${((snapshot?.hp.monster ?? level.hp?.monster ?? 100) / (snapshot?.hpMax.monster ?? level.hp?.monster ?? 100)) * 100}%` }}
-                  />
-                </div>
-                <div className={`${styles.character} ${styles.zombie} ${zombieAttacking ? styles.attacking : ''} ${zombieDamaged ? styles.damaged : ''}`}>
-                  🧟
-                </div>
-              </div>
-            </div>
-          </div>
+        <form className={`glass-card ${styles.keypadPanel}`} onSubmit={onSubmit}>
+          <div className={styles.padGrid}>
+            {keypadButtons.map(({ key, label, onPress, type = 'button', variant, span }) => {
+              const variantClass =
+                variant === 'action' ? styles.padAction : variant === 'submit' ? styles.padSubmit : '';
+              const spanClass = span === 'wide' ? styles.padWide : '';
+              const classes = [styles.padButton, variantClass, spanClass].filter(Boolean).join(' ');
 
-          <div className={`glass-card`}>
-            <div className={styles.statsArea}>
-              <div className={`${styles.timer} ${(snapshot?.timeLeft ?? level.timeSec) <= 10 ? styles.warning : ''}`}>
-                ⏱️ {formatTime(snapshot?.timeLeft ?? level.timeSec)}
-              </div>
-              {snapshot && snapshot.combo > 0 && (
-                <div className={`${styles.comboDisplay} ${snapshot.combo >= 10 ? styles.ultra : snapshot.combo >= 5 ? styles.high : ''}`}>
-                  🔥 连击 x{snapshot.combo} 🔥
-                </div>
-              )}
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>当前题目</span>
-                <span className={styles.statValue}>
-                  {snapshot ? snapshot.questionIndex + 1 : 1} / {snapshot ? snapshot.questionTotal : level.count}
-                </span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>正确率</span>
-                <span className={styles.statValue}>
-                  {snapshot && snapshot.questionIndex > 0
-                    ? Math.round((snapshot.correct / snapshot.questionIndex) * 100)
-                    : snapshot?.correct
-                    ? 100
-                    : 0}
-                  %
-                </span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>当前连击</span>
-                <span className={styles.statValue}>{snapshot?.combo ?? 0}</span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>最高连击</span>
-                <span className={styles.statValue}>{snapshot?.maxCombo ?? 0}</span>
-              </div>
-            </div>
+              return (
+                <button
+                  key={key}
+                  type={type}
+                  onClick={(evt) => {
+                    if (type === 'submit') {
+                      evt.preventDefault();
+                      if (!answer.trim() || state !== 'playing') return;
+                    }
+                    onPress();
+                  }}
+                  disabled={type === 'submit' && (!answer.trim() || state !== 'playing')}
+                  className={classes}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </form>
+      </main>
+
+      <footer className={`glass-card ${styles.bottomPanel}`}>
+        <div className={styles.bottomStats}>
+          <div>
+            <span className={styles.statLabel}>进度</span>
+            <strong className={styles.statValue}>
+              {answeredQuestions}/{totalQuestions}
+            </strong>
+          </div>
+          <div>
+            <span className={styles.statLabel}>正确率</span>
+            <strong className={styles.statValue}>{accuracy}%</strong>
+          </div>
+          <div>
+            <span className={styles.statLabel}>最高连击</span>
+            <strong className={styles.statValue}>{snapshot?.maxCombo ?? 0}</strong>
           </div>
         </div>
-      </div>
+        <div className={styles.bottomProgress}>
+          <div className={styles.progressTrack}>
+            <div className={styles.progressFill} style={{ width: `${progressPercent}%` }} />
+          </div>
+          <span className={styles.progressHint}>再答 {Math.max(0, totalQuestions - answeredQuestions)} 题就能赢！</span>
+        </div>
+        <div className={styles.actionRow}>
+          <button className="btn secondary" onClick={() => navigate('/levels')}>
+            ⬅️ 返回关卡
+          </button>
+          <button
+            className="btn secondary"
+            onClick={handleExit}
+            style={{ background: showExitConfirm ? 'linear-gradient(135deg, #ef4444, #dc2626)' : undefined }}
+          >
+            {showExitConfirm ? '⚠️ 确认退出？' : '❌ 退出关卡'}
+          </button>
+          <button className="btn" onClick={handleSubmit} disabled={!answer.trim() || state !== 'playing'}>
+            ✓ 提交答案
+          </button>
+        </div>
+      </footer>
     </div>
   );
 };
