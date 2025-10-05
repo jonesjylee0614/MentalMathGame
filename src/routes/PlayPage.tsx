@@ -246,12 +246,10 @@ export const PlayPage = () => {
 
   return (
     <div className={`fade-in ${styles.wrapper}`}>
+      {/* 顶部状态区：关卡名 + 进度 + 倒计时 */}
       <header className={`glass-card ${styles.topBar}`}>
-        <div className={styles.levelMeta}>
-          <div className={styles.levelText}>
-            <span className={styles.levelCategory}>🏁 当前关卡</span>
-            <h2>{level.name}</h2>
-          </div>
+        <div className={styles.levelInfo}>
+          <span className={styles.levelCategory}>🏁 {level.name}</span>
           <div className={styles.levelProgress}>
             <span>第 {currentQuestion || 1}/{totalQuestions} 题</span>
             <div className={styles.progressTrack}>
@@ -259,81 +257,91 @@ export const PlayPage = () => {
             </div>
           </div>
         </div>
-        <div className={styles.rightPanel}>
-          <div
-            className={`${styles.timerOrb} ${timeLeft <= 10 ? styles.timerCritical : ''}`}
-            style={{ '--timer-angle': `${timerAngle}deg` } as CSSProperties}
-          >
-            <div className={styles.timerCore}>
-              <span className={styles.timerLabel}>剩余</span>
-              <strong>{formatTime(timeLeft)}</strong>
-            </div>
+        <div
+          className={`${styles.timerOrb} ${timeLeft <= 10 ? styles.timerCritical : ''}`}
+          style={{ '--timer-angle': `${timerAngle}deg` } as CSSProperties}
+        >
+          <div className={styles.timerCore}>
+            <span className={styles.timerLabel}>倒计时</span>
+            <strong>{formatTime(timeLeft)}</strong>
           </div>
-          <section className={styles.energyPanel}>
-            <div className={styles.energyRow}>
-              <div className={styles.energyMeta}>
-                <span className={styles.energyIcon}>🌻</span>
-                <span className={styles.energyLabel}>我方</span>
-              </div>
-              <div
-                className={`${styles.energyBar} ${plantAttacking ? styles.energySurge : ''} ${playerDamaged ? styles.energyHit : ''}`}
-              >
-                <div className={styles.energyFill} style={{ width: `${playerHpPercent}%` }} />
-              </div>
-              <span className={styles.energyValue}>{playerHpPercent}%</span>
-            </div>
-            <div className={styles.energyRow}>
-              <div className={styles.energyMeta}>
-                <span className={styles.energyIcon}>👾</span>
-                <span className={styles.energyLabel}>怪兽</span>
-              </div>
-              <div
-                className={`${styles.energyBar} ${zombieAttacking ? styles.energySurge : ''} ${zombieDamaged ? styles.energyHit : ''}`}
-              >
-                <div className={`${styles.energyFill} ${styles.enemy}`} style={{ width: `${monsterHpPercent}%` }} />
-              </div>
-              <span className={styles.energyValue}>{monsterHpPercent}%</span>
-            </div>
-            {snapshot && snapshot.combo > 0 && (
-              <div className={styles.comboBanner}>
-                <span>🔥 连击 x{snapshot.combo}</span>
-              </div>
-            )}
-          </section>
         </div>
+        <span className={styles.motivationalText}>{motivationalMessage}</span>
       </header>
 
-      <main className={styles.stage}>
-        <div className={styles.leftColumn}>
-          <div className={`glass-card ${styles.questionPanel}`}>
-            {showStars && <div className={styles.starBurst} aria-hidden="true" />}
-            <div className={styles.questionHeader}>
-              <span className={styles.questionIndex}>第 {currentQuestion || 1} 题</span>
-              <span className={styles.questionGoal}>{motivationalMessage}</span>
-            </div>
-            <div className={styles.questionBody}>
-              {question ? (
-                <p className={styles.questionText}>{question.text}</p>
-              ) : (
-                <p className={styles.readyText}>🎮 准备开始...</p>
-              )}
-              <div className={styles.answerWindow}>
-                <input value={answer} placeholder="输入答案" readOnly />
-              </div>
-            </div>
-            {feedback && (
+      {/* 战斗区：角色 + 血条 + 连击 */}
+      <section className={`glass-card ${styles.battleZone}`}>
+        <div className={styles.battleRow}>
+          <div className={styles.characterLeft}>
+            <span className={`${styles.characterIcon} ${plantAttacking ? styles.attacking : ''}`}>🌻</span>
+            <div className={styles.hpBar}>
               <div
-                className={`${
-                  feedback.correct
-                    ? styles.feedbackPositive
-                    : settings.shake
-                    ? styles.feedbackNegative
-                    : styles.feedbackNeutral
-                } ${styles.feedbackToast}`}
-              >
-                {feedback.correct ? encouragingMsg : `❌ 正确答案：${feedback.expected}`}
-              </div>
+                className={`${styles.hpFill} ${playerDamaged ? styles.hpDamaged : ''}`}
+                style={{ width: `${playerHpPercent}%` }}
+              />
+            </div>
+            <span className={styles.hpLabel}>我方 {playerHpPercent}%</span>
+          </div>
+
+          {snapshot && snapshot.combo > 0 && (
+            <div className={styles.comboBadge}>
+              🔥 连击 x{snapshot.combo}
+            </div>
+          )}
+
+          <div className={styles.characterRight}>
+            <span className={styles.hpLabel}>怪兽 {monsterHpPercent}%</span>
+            <div className={styles.hpBar}>
+              <div
+                className={`${styles.hpFill} ${styles.enemy} ${zombieDamaged ? styles.hpDamaged : ''}`}
+                style={{ width: `${monsterHpPercent}%` }}
+              />
+            </div>
+            <span className={`${styles.characterIcon} ${zombieAttacking ? styles.attacking : ''}`}>👾</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 主区：题目(左) + 输入区(右) */}
+      <main className={styles.stage}>
+        <div className={`glass-card ${styles.questionPanel}`}>
+          {showStars && <div className={styles.starBurst} aria-hidden="true" />}
+          <div className={styles.questionHeader}>
+            <span className={styles.questionIndex}>第 {currentQuestion || 1} 题</span>
+          </div>
+          <div className={styles.questionBody}>
+            {question ? (
+              <p className={styles.questionText}>{question.text}</p>
+            ) : (
+              <p className={styles.readyText}>🎮 准备开始...</p>
             )}
+          </div>
+          {feedback && (
+            <div
+              className={`${
+                feedback.correct
+                  ? styles.feedbackPositive
+                  : settings.shake
+                  ? styles.feedbackNegative
+                  : styles.feedbackNeutral
+              } ${styles.feedbackToast}`}
+            >
+              {feedback.correct ? encouragingMsg : `❌ 正确答案：${feedback.expected}`}
+            </div>
+          )}
+        </div>
+
+        <div className={styles.inputArea}>
+          <div className={`glass-card ${styles.answerPanel}`}>
+            <label className={styles.answerLabel}>你的答案</label>
+            <div className={styles.answerDisplay}>
+              <input
+                value={answer}
+                placeholder="请输入答案"
+                readOnly
+                className={answer ? styles.hasValue : ''}
+              />
+            </div>
           </div>
 
           <form className={`glass-card ${styles.keypadPanel}`} onSubmit={onSubmit}>
@@ -365,54 +373,9 @@ export const PlayPage = () => {
             </div>
           </form>
         </div>
-
-        <div className={styles.rightColumn}>
-          <div className={`glass-card ${styles.battleZone}`}>
-            <div
-              className={`${styles.timerOrb} ${timeLeft <= 10 ? styles.timerCritical : ''}`}
-              style={{ '--timer-angle': `${timerAngle}deg` } as CSSProperties}
-            >
-              <div className={styles.timerCore}>
-                <span className={styles.timerLabel}>剩余时间</span>
-                <strong>{formatTime(timeLeft)}</strong>
-              </div>
-            </div>
-            
-            <section className={styles.energyPanel}>
-              <div className={styles.energyRow}>
-                <div className={styles.energyMeta}>
-                  <span className={styles.energyIcon}>🌻</span>
-                  <span className={styles.energyLabel}>我方</span>
-                </div>
-                <div
-                  className={`${styles.energyBar} ${plantAttacking ? styles.energySurge : ''} ${playerDamaged ? styles.energyHit : ''}`}
-                >
-                  <div className={styles.energyFill} style={{ width: `${playerHpPercent}%` }} />
-                </div>
-                <span className={styles.energyValue}>{playerHpPercent}%</span>
-              </div>
-              <div className={styles.energyRow}>
-                <div className={styles.energyMeta}>
-                  <span className={styles.energyIcon}>👾</span>
-                  <span className={styles.energyLabel}>怪兽</span>
-                </div>
-                <div
-                  className={`${styles.energyBar} ${zombieAttacking ? styles.energySurge : ''} ${zombieDamaged ? styles.energyHit : ''}`}
-                >
-                  <div className={`${styles.energyFill} ${styles.enemy}`} style={{ width: `${monsterHpPercent}%` }} />
-                </div>
-                <span className={styles.energyValue}>{monsterHpPercent}%</span>
-              </div>
-              {snapshot && snapshot.combo > 0 && (
-                <div className={styles.comboBanner}>
-                  🔥 连击 x{snapshot.combo}
-                </div>
-              )}
-            </section>
-          </div>
-        </div>
       </main>
 
+      {/* 底部状态栏 */}
       <footer className={`glass-card ${styles.bottomPanel}`}>
         <div className={styles.bottomStats}>
           <div>
@@ -426,21 +389,20 @@ export const PlayPage = () => {
             <strong className={styles.statValue}>{accuracy}%</strong>
           </div>
           <div>
-            <span className={styles.statLabel}>连击</span>
+            <span className={styles.statLabel}>最高连击</span>
             <strong className={styles.statValue}>{snapshot?.maxCombo ?? 0}</strong>
           </div>
         </div>
-        <span className={styles.progressHint}>{motivationalMessage}</span>
         <div className={styles.actionRow}>
           <button className="btn secondary" onClick={() => navigate('/levels')}>
-            ⬅️ 返回
+            ⬅️ 返回关卡
           </button>
           <button
             className="btn secondary"
             onClick={handleExit}
             style={{ background: showExitConfirm ? 'linear-gradient(135deg, #ef4444, #dc2626)' : undefined }}
           >
-            {showExitConfirm ? '⚠️ 确认？' : '❌ 退出'}
+            {showExitConfirm ? '⚠️ 确认退出？' : '❌ 退出'}
           </button>
         </div>
       </footer>
