@@ -37,6 +37,8 @@ export const PlayPage = () => {
   const [playerDamaged, setPlayerDamaged] = useState(false);
   const [showStars, setShowStars] = useState(false);
   const [encouragingMsg, setEncouragingMsg] = useState('');
+  const [showBullet, setShowBullet] = useState(false);
+  const [showZombieBullet, setShowZombieBullet] = useState(false);
   const playSound = useFeedbackSound(settings.audio);
 
   const handleNumberClick = useCallback(
@@ -103,7 +105,7 @@ export const PlayPage = () => {
     const unsubState = Game.on('statechange', ({ state: nextState }) => setState(nextState));
     const unsubQuestion = Game.on('question', (next) => {
       setQuestion(next);
-      setAnswer('');
+      // Don't clear answer here - wait for user to see result
       setFeedback(null); // Clear feedback when moving to next question
     });
     const unsubUpdate = Game.on('update', (snap) => setSnapshot(snap));
@@ -111,12 +113,18 @@ export const PlayPage = () => {
       setFeedback(fb);
       playSound(fb.correct ? 'success' : 'error');
 
+      // Clear answer after a short delay to let user see the result
+      setTimeout(() => {
+        setAnswer('');
+      }, 800);
+
       // Trigger animations
       if (fb.correct) {
         const randomMsg = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
         setEncouragingMsg(randomMsg);
         setPlantAttacking(true);
         setShowStars(true);
+        setShowBullet(true);
         setTimeout(() => {
           setZombieDamaged(true);
         }, 260);
@@ -124,15 +132,18 @@ export const PlayPage = () => {
           setPlantAttacking(false);
           setZombieDamaged(false);
           setShowStars(false);
+          setShowBullet(false);
         }, 1000);
       } else {
         setZombieAttacking(true);
+        setShowZombieBullet(true);
         setTimeout(() => {
           setPlayerDamaged(true);
         }, 300);
         setTimeout(() => {
           setZombieAttacking(false);
           setPlayerDamaged(false);
+          setShowZombieBullet(false);
         }, 600);
       }
     });
@@ -218,7 +229,7 @@ export const PlayPage = () => {
     { key: '4', label: '4', onPress: () => handleNumberClick('4') },
     { key: '5', label: '5', onPress: () => handleNumberClick('5') },
     { key: '6', label: '6', onPress: () => handleNumberClick('6') },
-    { key: 'clear', label: '清空', onPress: handleClear, variant: 'action' },
+    { key: 'clear', label: 'C', onPress: handleClear, variant: 'action' },
     { key: '1', label: '1', onPress: () => handleNumberClick('1') },
     { key: '2', label: '2', onPress: () => handleNumberClick('2') },
     { key: '3', label: '3', onPress: () => handleNumberClick('3') },
@@ -272,16 +283,21 @@ export const PlayPage = () => {
       {/* 战斗区：角色 + 血条 + 连击 */}
       <section className={`glass-card ${styles.battleZone}`}>
         <div className={styles.battleRow}>
-          <div className={styles.characterLeft}>
-            <span className={`${styles.characterIcon} ${plantAttacking ? styles.attacking : ''}`}>🌻</span>
-            <div className={styles.hpBar}>
-              <div
-                className={`${styles.hpFill} ${playerDamaged ? styles.hpDamaged : ''}`}
-                style={{ width: `${playerHpPercent}%` }}
-              />
+          <div className={styles.characterWrapper}>
+            <div className={styles.characterHpTop}>
+              <div className={styles.hpBar}>
+                <div
+                  className={`${styles.hpFill} ${playerDamaged ? styles.hpDamaged : ''}`}
+                  style={{ width: `${playerHpPercent}%` }}
+                />
+              </div>
+              <span className={styles.hpLabel}>{playerHpPercent}%</span>
             </div>
-            <span className={styles.hpLabel}>我方 {playerHpPercent}%</span>
+            <span className={`${styles.characterIcon} ${plantAttacking ? styles.attacking : ''}`}>🌻</span>
           </div>
+
+          {showBullet && <div className={styles.bullet}>💥</div>}
+          {showZombieBullet && <div className={styles.zombieBullet}>💢</div>}
 
           {snapshot && snapshot.combo > 0 && (
             <div className={styles.comboBadge}>
@@ -289,13 +305,15 @@ export const PlayPage = () => {
             </div>
           )}
 
-          <div className={styles.characterRight}>
-            <span className={styles.hpLabel}>怪兽 {monsterHpPercent}%</span>
-            <div className={styles.hpBar}>
-              <div
-                className={`${styles.hpFill} ${styles.enemy} ${zombieDamaged ? styles.hpDamaged : ''}`}
-                style={{ width: `${monsterHpPercent}%` }}
-              />
+          <div className={styles.characterWrapper}>
+            <div className={styles.characterHpTop}>
+              <div className={styles.hpBar}>
+                <div
+                  className={`${styles.hpFill} ${styles.enemy} ${zombieDamaged ? styles.hpDamaged : ''}`}
+                  style={{ width: `${monsterHpPercent}%` }}
+                />
+              </div>
+              <span className={styles.hpLabel}>{monsterHpPercent}%</span>
             </div>
             <span className={`${styles.characterIcon} ${zombieAttacking ? styles.attacking : ''}`}>👾</span>
           </div>

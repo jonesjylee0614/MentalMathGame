@@ -2,8 +2,8 @@
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: clamp(32px, 6vw, 64px) clamp(16px, 5vw, 80px);
+  align-items: flex-start;
+  padding: clamp(48px, 8vh, 80px) clamp(16px, 5vw, 80px);
   background: radial-gradient(circle at top, rgba(255, 237, 213, 0.8), rgba(254, 215, 170, 0.55));
 }
 
