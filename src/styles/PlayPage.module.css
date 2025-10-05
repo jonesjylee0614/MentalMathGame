@@ -193,20 +193,22 @@
   position: absolute;
   left: 20%;
   top: 50%;
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-size: clamp(2.5rem, 5vw, 4rem);
   animation: bulletFly 0.5s ease-out forwards;
   z-index: 5;
   pointer-events: none;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .zombieBullet {
   position: absolute;
   right: 20%;
   top: 50%;
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-size: clamp(2.5rem, 5vw, 4rem);
   animation: zombieBulletFly 0.5s ease-out forwards;
   z-index: 5;
   pointer-events: none;
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .comboBadge {
@@ -296,12 +298,39 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(254, 243, 199, 0.95));
   border: 3px solid rgba(249, 115, 22, 0.4);
   box-shadow: 0 16px 40px rgba(234, 88, 12, 0.2);
-  overflow: hidden;
+  overflow: visible; /* 改为visible让遮罩层可以超出 */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 0;
+}
+
+.feedbackOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  animation: overlayFade 0.3s ease;
+  pointer-events: none;
+}
+
+.overlayCorrect {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.5) 0%, rgba(16, 185, 129, 0) 70%);
+}
+
+.overlayWrong {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.5) 0%, rgba(239, 68, 68, 0) 70%);
+  animation: overlayFlash 0.5s ease;
+}
+
+@keyframes overlayFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes overlayFlash {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.3; }
 }
 
 .starBurst {

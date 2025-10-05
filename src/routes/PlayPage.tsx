@@ -362,32 +362,35 @@ export const PlayPage = () => {
             )}
           </div>
           {feedback && (
-            <div
-              className={`${
-                feedback.correct
-                  ? styles.feedbackPositive
-                  : settings.shake
-                  ? styles.feedbackNegative
-                  : styles.feedbackNeutral
-              } ${styles.feedbackToast} ${styles.feedbackLarge}`}
-            >
-              <div className={styles.feedbackIcon}>
-                {feedback.correct ? '✅' : '❌'}
+            <>
+              <div className={`${styles.feedbackOverlay} ${feedback.correct ? styles.overlayCorrect : styles.overlayWrong}`} />
+              <div
+                className={`${
+                  feedback.correct
+                    ? styles.feedbackPositive
+                    : settings.shake
+                    ? styles.feedbackNegative
+                    : styles.feedbackNeutral
+                } ${styles.feedbackToast} ${styles.feedbackLarge}`}
+              >
+                <div className={styles.feedbackIcon}>
+                  {feedback.correct ? '✅' : '❌'}
+                </div>
+                <div className={styles.feedbackText}>
+                  {feedback.correct ? (
+                    <>
+                      <div className={styles.feedbackTitle}>答对了！！！</div>
+                      <div className={styles.feedbackMsg}>{encouragingMsg}</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className={styles.feedbackTitle}>答错了！！！</div>
+                      <div className={styles.feedbackMsg}>正确答案是：{feedback.expected}</div>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className={styles.feedbackText}>
-                {feedback.correct ? (
-                  <>
-                    <div className={styles.feedbackTitle}>答对了！</div>
-                    <div className={styles.feedbackMsg}>{encouragingMsg}</div>
-                  </>
-                ) : (
-                  <>
-                    <div className={styles.feedbackTitle}>答错了</div>
-                    <div className={styles.feedbackMsg}>正确答案：{feedback.expected}</div>
-                  </>
-                )}
-              </div>
-            </div>
+            </>
           )}
         </div>
 
