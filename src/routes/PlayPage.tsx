@@ -32,6 +32,7 @@ export const PlayPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [plantAttacking, setPlantAttacking] = useState(false);
+  const [zombieAttacking, setZombieAttacking] = useState(false);
   const [zombieDamaged, setZombieDamaged] = useState(false);
   const [playerDamaged, setPlayerDamaged] = useState(false);
   const [showProjectile, setShowProjectile] = useState(false);
@@ -72,10 +73,14 @@ export const PlayPage = () => {
           setShowStars(false);
         }, 1000);
       } else {
-        setPlayerDamaged(true);
+        setZombieAttacking(true);
         setTimeout(() => {
+          setPlayerDamaged(true);
+        }, 300);
+        setTimeout(() => {
+          setZombieAttacking(false);
           setPlayerDamaged(false);
-        }, 500);
+        }, 600);
       }
     });
     const unsubFinish = Game.on('finish', (result) => {
@@ -287,7 +292,7 @@ export const PlayPage = () => {
                     style={{ width: `${((snapshot?.hp.monster ?? level.hp?.monster ?? 100) / (snapshot?.hpMax.monster ?? level.hp?.monster ?? 100)) * 100}%` }}
                   />
                 </div>
-                <div className={`${styles.character} ${styles.zombie} ${zombieDamaged ? styles.damaged : ''}`}>
+                <div className={`${styles.character} ${styles.zombie} ${zombieAttacking ? styles.attacking : ''} ${zombieDamaged ? styles.damaged : ''}`}>
                   🧟
                 </div>
               </div>
