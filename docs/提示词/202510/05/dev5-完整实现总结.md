@@ -282,21 +282,23 @@ const unsubFeedback = Game.on('feedback', (fb) => {
 - 不能输入后立即切换题目
 
 **问题分析：**
-之前的逻辑在接收到新题目时立即清空答案，导致用户看到答案一闪而过
+1. 之前的逻辑在接收到新题目时立即清空答案，导致用户看到答案一闪而过
+2. 缺少提交状态锁定，可能导致重复提交和状态混乱
+3. Form表单可能触发意外提交
 
 **实现方案：**
 
-#### 修改题目切换逻辑
-**文件：** `src/routes/PlayPage.tsx`
+> 📖 详细修复说明请参考：[dev5-输入逻辑修复详解.md](./dev5-输入逻辑修复详解.md)
+
+#### 新增提交状态锁
 
 ```tsx
-// 修改前：接收新题目时立即清空答案
-const unsubQuestion = Game.on('question', (next) => {
-  setQuestion(next);
-  setAnswer('');  // ❌ 立即清空
-  setFeedback(null);
-});
+const [isSubmitting, setIsSubmitting] = useState(false);
+```
 
+#### 修改题目切换逻辑
+
+```tsx
 // 修改后：不立即清空答案
 const unsubQuestion = Game.on('question', (next) => {
   setQuestion(next);
@@ -305,50 +307,74 @@ const unsubQuestion = Game.on('question', (next) => {
 });
 ```
 
-#### 在反馈事件中延迟清空
-**文件：** `src/routes/PlayPage.tsx`
+#### 在反馈事件中延迟清空并解锁
 
 ```tsx
 const unsubFeedback = Game.on('feedback', (fb) => {
   setFeedback(fb);
   playSound(fb.correct ? 'success' : 'error');
 
-  // ✅ 延迟800ms清空答案，让用户看到结果
   setTimeout(() => {
     setAnswer('');
+    setIsSubmitting(false); // 🔓 解锁
   }, 800);
-
-  // 触发动画...
+  // ...
 });
 ```
 
-#### 提交按钮状态控制
-**文件：** `src/routes/PlayPage.tsx`
+#### 提交时加锁
+
+```tsx
+const handleSubmit = useCallback(() => {
+  if (!answer.trim() || state !== 'playing' || isSubmitting) return;
+  setIsSubmitting(true); // 🔒 加锁
+  Game.submit(answer);
+  setFeedback(null);
+}, [answer, state, isSubmitting]);
+```
+
+#### 输入时检查提交状态
+
+```tsx
+const handleNumberClick = useCallback(
+  (num: string) => {
+    if (state !== 'playing' || isSubmitting) return; // 提交时禁止输入
+    setAnswer((prev) => prev + num);
+  },
+  [state, isSubmitting]
+);
+```
+
+#### 按钮点击保护
 
 ```tsx
 <button
-  type="submit"
   onClick={(evt) => {
+    evt.preventDefault(); // 阻止所有按钮的默认行为
     if (type === 'submit') {
-      evt.preventDefault();
-      // 只有有答案且游戏进行中才能提交
-      if (!answer.trim() || state !== 'playing') return;
+      if (!answer.trim() || state !== 'playing' || isSubmitting) return;
+    } else {
+      if (isSubmitting) return; // 提交中禁止操作
     }
     onPress();
   }}
-  disabled={type === 'submit' && (!answer.trim() || state !== 'playing')}
-  className={classes}
+  disabled={type === 'submit' && (!answer.trim() || state !== 'playing' || isSubmitting)}
 >
-  ✓ 提交
+  {label}
 </button>
 ```
 
 **完整流程：**
 1. 用户输入数字 → `answer` 状态更新 → 显示在输入框中
 2. 有答案时 → 提交按钮从禁用变为可点击 → 按钮变色
-3. 点击提交 → 调用 `Game.submit(answer)` → 引擎处理
-4. 引擎触发 `feedback` 事件 → 显示正确/错误反馈
-5. 800ms后 → 清空答案 → 进入下一题
+3. 点击提交 → `isSubmitting = true` 🔒 → 调用 `Game.submit(answer)`
+4. 引擎触发 `feedback` 事件 → 显示反馈
+5. 800ms后 → 清空答案 → `isSubmitting = false` 🔓 → 进入下一题
+
+**防护机制：**
+- 提交期间禁止输入数字（防止状态混乱）
+- 提交期间禁止重复提交（防止并发问题）
+- 所有按钮preventDefault（防止表单意外提交）
 
 ---
 
