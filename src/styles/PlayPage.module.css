@@ -193,35 +193,37 @@
 
 .bullet {
   position: absolute;
-  left: 8%;
+  left: 0;
   top: 50%;
   font-size: clamp(2rem, 4vw, 3rem);
   animation: bulletFly 1.2s ease-out forwards;
-  z-index: 50;
+  z-index: 100;
   pointer-events: none;
   filter: drop-shadow(0 0 10px rgba(34, 197, 94, 1)) 
           drop-shadow(0 0 20px rgba(34, 197, 94, 0.5))
           drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  will-change: transform, opacity;
 }
 
 .zombieBullet {
   position: absolute;
-  right: 8%;
+  right: 0;
   top: 50%;
   font-size: clamp(2rem, 4vw, 3rem);
   animation: zombieBulletFly 1s ease-out forwards;
-  z-index: 50;
+  z-index: 100;
   pointer-events: none;
   filter: drop-shadow(0 0 10px rgba(234, 88, 12, 1)) 
           drop-shadow(0 0 20px rgba(234, 88, 12, 0.5))
           drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  will-change: transform, opacity;
 }
 
 .comboBadge {
   position: absolute;
   top: 50%;
-  right: 25%; /* 更靠右，不遮挡僵尸 */
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
   padding: 10px 20px;
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(249, 115, 22, 0.95), rgba(251, 191, 36, 0.95));
@@ -230,7 +232,8 @@
   font-size: clamp(1.1rem, 2vw, 1.4rem);
   box-shadow: 0 8px 24px rgba(249, 115, 22, 0.5);
   animation: comboFloat 1.2s ease-in-out infinite;
-  z-index: 10;
+  z-index: 15;
+  pointer-events: none;
 }
 
 .timerOrb {
@@ -727,42 +730,42 @@
 
 @keyframes bulletFly {
   0% {
-    left: 8%;
+    left: 5%;
     opacity: 0;
     transform: translateY(-50%) scale(0.3);
   }
   5% {
-    left: 10%;
+    left: 8%;
     opacity: 1;
     transform: translateY(-50%) scale(0.7);
   }
   15% {
-    left: 20%;
+    left: 18%;
     opacity: 1;
     transform: translateY(-50%) scale(0.8) rotate(10deg);
   }
   30% {
-    left: 35%;
+    left: 33%;
     opacity: 1;
     transform: translateY(-50%) scale(0.9) rotate(-5deg);
   }
   50% {
-    left: 55%;
+    left: 53%;
     opacity: 1;
     transform: translateY(-50%) scale(1) rotate(5deg);
   }
   70% {
-    left: 75%;
+    left: 73%;
     opacity: 1;
     transform: translateY(-50%) scale(1.05) rotate(-3deg);
   }
   90% {
-    left: 90%;
+    left: 88%;
     opacity: 1;
     transform: translateY(-50%) scale(1.1);
   }
   100% {
-    left: 92%;
+    left: 95%;
     opacity: 0;
     transform: translateY(-50%) scale(1.5);
   }
@@ -770,42 +773,42 @@
 
 @keyframes zombieBulletFly {
   0% {
-    right: 8%;
+    right: 5%;
     opacity: 0;
     transform: translateY(-50%) scale(0.3) scaleX(-1);
   }
   5% {
-    right: 10%;
+    right: 8%;
     opacity: 1;
     transform: translateY(-50%) scale(0.7) scaleX(-1);
   }
   15% {
-    right: 20%;
+    right: 18%;
     opacity: 1;
     transform: translateY(-50%) scale(0.8) scaleX(-1) rotate(-10deg);
   }
   30% {
-    right: 35%;
+    right: 33%;
     opacity: 1;
     transform: translateY(-50%) scale(0.9) scaleX(-1) rotate(5deg);
   }
   50% {
-    right: 55%;
+    right: 53%;
     opacity: 1;
     transform: translateY(-50%) scale(1) scaleX(-1) rotate(-5deg);
   }
   70% {
-    right: 75%;
+    right: 73%;
     opacity: 1;
     transform: translateY(-50%) scale(1.05) scaleX(-1) rotate(3deg);
   }
   90% {
-    right: 90%;
+    right: 88%;
     opacity: 1;
     transform: translateY(-50%) scale(1.1) scaleX(-1);
   }
   100% {
-    right: 92%;
+    right: 95%;
     opacity: 0;
     transform: translateY(-50%) scale(1.5) scaleX(-1);
   }
@@ -844,7 +847,7 @@
     box-shadow: 0 8px 24px rgba(249, 115, 22, 0.5);
   }
   50% {
-    transform: translate(-50%, -55%) scale(1.05);
+    transform: translate(-50%, -50%) scale(1.08);
     box-shadow: 0 12px 32px rgba(251, 191, 36, 0.6);
   }
 }
