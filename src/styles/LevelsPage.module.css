@@ -1,0 +1,74 @@
+.searchCard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  align-items: center;
+}
+
+.searchBox input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.45);
+  color: #f8fafc;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchBox input:focus {
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.categoryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.levelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.levelCard {
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.65), rgba(15, 23, 42, 0.45));
+  display: grid;
+  gap: 14px;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.levelCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+.levelInfo h4 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.levelInfo p {
+  color: rgba(226, 232, 240, 0.75);
+  font-size: 0.9rem;
+}
+
+.levelStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: rgba(148, 163, 184, 0.85);
+  font-size: 0.85rem;
+}
+
+.empty {
+  text-align: center;
+  color: rgba(148, 163, 184, 0.85);
+}

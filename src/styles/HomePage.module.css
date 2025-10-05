@@ -1,0 +1,108 @@
+.hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 32px;
+  align-items: center;
+  overflow: visible;
+}
+
+.welcome {
+  font-size: 1rem;
+  color: rgba(191, 219, 254, 0.85);
+  margin-bottom: 8px;
+}
+
+.hero h2 {
+  font-size: 2.4rem;
+  margin-bottom: 12px;
+  background: linear-gradient(90deg, #60a5fa, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  color: rgba(226, 232, 240, 0.8);
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.badges {
+  display: grid;
+  gap: 16px;
+  color: rgba(148, 163, 184, 0.85);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sectionHeader h3 {
+  font-size: 1.4rem;
+}
+
+.sectionHeader p {
+  color: rgba(148, 163, 184, 0.75);
+}
+
+.levelList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.levelItem {
+  text-align: left;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.35), rgba(29, 78, 216, 0.1));
+  color: #e2e8f0;
+  cursor: pointer;
+  display: grid;
+  gap: 12px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.levelItem:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px rgba(37, 99, 235, 0.4);
+}
+
+.levelItem h4 {
+  font-size: 1.1rem;
+}
+
+.levelItem p {
+  color: rgba(226, 232, 240, 0.75);
+  font-size: 0.9rem;
+}
+
+.levelMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: rgba(148, 163, 184, 0.85);
+}
+
+.recentCard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: center;
+  gap: 18px;
+}
+
+.recentMeta {
+  display: grid;
+  gap: 8px;
+  color: rgba(148, 163, 184, 0.85);
+}
