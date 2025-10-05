@@ -105,7 +105,8 @@
   border: 2px solid rgba(249, 115, 22, 0.35);
   box-shadow: 0 8px 28px rgba(234, 88, 12, 0.18);
   z-index: 2;
-  overflow: visible; /* 让子弹可以超出边界 */
+  overflow: visible !important; /* 让子弹可以超出边界 */
+  isolation: isolate; /* 创建独立的层叠上下文 */
 }
 
 .battleRow {
@@ -201,14 +202,17 @@
   left: 10%;
   top: 50%;
   transform: translateY(-50%);
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(2.5rem, 5vw, 4rem);
   animation: bulletFly 1.2s ease-out forwards;
-  z-index: 100;
+  z-index: 100 !important;
   pointer-events: none;
-  filter: drop-shadow(0 0 10px rgba(34, 197, 94, 1)) 
-          drop-shadow(0 0 20px rgba(34, 197, 94, 0.5))
-          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 0 15px rgba(34, 197, 94, 1)) 
+          drop-shadow(0 0 30px rgba(34, 197, 94, 0.8))
+          drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
   will-change: left, transform, opacity;
+  background: rgba(34, 197, 94, 0.3);
+  border-radius: 50%;
+  padding: 5px;
 }
 
 .zombieBullet {
@@ -216,14 +220,17 @@
   right: 10%;
   top: 50%;
   transform: translateY(-50%) scaleX(-1);
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(2.5rem, 5vw, 4rem);
   animation: zombieBulletFly 1s ease-out forwards;
-  z-index: 100;
+  z-index: 100 !important;
   pointer-events: none;
-  filter: drop-shadow(0 0 10px rgba(234, 88, 12, 1)) 
-          drop-shadow(0 0 20px rgba(234, 88, 12, 0.5))
-          drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 0 15px rgba(234, 88, 12, 1)) 
+          drop-shadow(0 0 30px rgba(234, 88, 12, 0.8))
+          drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
   will-change: right, transform, opacity;
+  background: rgba(234, 88, 12, 0.3);
+  border-radius: 50%;
+  padding: 5px;
 }
 
 .comboBadge {
