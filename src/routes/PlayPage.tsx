@@ -6,6 +6,7 @@ import { findLevel } from '../lib/levels';
 import { formatTime } from '../lib/utils';
 import { useFeedbackSound } from '../lib/sound';
 import { GameResult, GameSnapshot, Question } from '../lib/types';
+import { useProjectileAnimations } from '../hooks/useProjectileAnimations';
 import styles from '../styles/PlayPage.module.css';
 
 const encouragingMessages = [
@@ -331,7 +332,7 @@ export const PlayPage = () => {
         setTimeout(() => {
           setZombieDamaged(true);
         }, 600);
-        
+
         setTimeout(() => {
           setPlantAttacking(false);
           setZombieDamaged(false);
@@ -350,7 +351,7 @@ export const PlayPage = () => {
         setTimeout(() => {
           setPlayerDamaged(true);
         }, 500);
-        
+
         setTimeout(() => {
           setZombieAttacking(false);
           setPlayerDamaged(false);
