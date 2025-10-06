@@ -2,12 +2,12 @@ import { Level } from './types';
 
 export const LEVELS: Level[] = [
   // 基础入门：5 内与 10 内
-  { id: 'add_1_5', category: '基础入门', name: '5以内的加法', desc: '例：2+3=?', generator: { type: 'addsub', ops: ['+'], max: 5 }, count: 20, timeSec: 60, difficulty: 1.0 },
-  { id: 'sub_1_5', category: '基础入门', name: '5以内的减法', desc: '例：4-2=?', generator: { type: 'addsub', ops: ['-'], max: 5 }, count: 20, timeSec: 60, difficulty: 1.0 },
-  { id: 'addsub_1_5', category: '基础入门', name: '5以内的加减法', desc: '加减混合', generator: { type: 'addsub', ops: ['+', '-'], max: 5 }, count: 20, timeSec: 60, difficulty: 1.1 },
-  { id: 'add_1_10', category: '基础入门', name: '10以内的加法', desc: '例：6+3=?', generator: { type: 'addsub', ops: ['+'], max: 10 }, count: 25, timeSec: 80, difficulty: 1.1 },
-  { id: 'sub_1_10', category: '基础入门', name: '10以内的减法', desc: '例：6-3=?', generator: { type: 'addsub', ops: ['-'], max: 10 }, count: 25, timeSec: 80, difficulty: 1.1 },
-  { id: 'addsub_1_10', category: '基础入门', name: '10以内的加减法', desc: '加减混合', generator: { type: 'addsub', ops: ['+', '-'], max: 10 }, count: 25, timeSec: 80, difficulty: 1.2 },
+  { id: 'add_1_5', category: '基础入门', name: '5以内的加法', desc: '例：2+3=?', generator: { type: 'addsub', ops: ['+'], max: 5 }, count: 20, timeSec: 300, difficulty: 1.0 },
+  { id: 'sub_1_5', category: '基础入门', name: '5以内的减法', desc: '例：4-2=?', generator: { type: 'addsub', ops: ['-'], max: 5 }, count: 20, timeSec: 300, difficulty: 1.0 },
+  { id: 'addsub_1_5', category: '基础入门', name: '5以内的加减法', desc: '加减混合', generator: { type: 'addsub', ops: ['+', '-'], max: 5 }, count: 20, timeSec: 300, difficulty: 1.1 },
+  { id: 'add_1_10', category: '基础入门', name: '10以内的加法', desc: '例：6+3=?', generator: { type: 'addsub', ops: ['+'], max: 10 }, count: 25, timeSec: 300, difficulty: 1.1 },
+  { id: 'sub_1_10', category: '基础入门', name: '10以内的减法', desc: '例：6-3=?', generator: { type: 'addsub', ops: ['-'], max: 10 }, count: 25, timeSec: 300, difficulty: 1.1 },
+  { id: 'addsub_1_10', category: '基础入门', name: '10以内的加减法', desc: '加减混合', generator: { type: 'addsub', ops: ['+', '-'], max: 10 }, count: 25, timeSec: 300, difficulty: 1.2 },
   { id: 'fill_1_10', category: '基础入门', name: '10以内的填括号', desc: '例：4-？=1', generator: { type: 'fill', mode: 'within10' }, count: 20, timeSec: 80, difficulty: 1.2 },
   { id: 'add_no_carry_20', category: '基础入门', name: '20以内不进位加法', desc: '例：16+3=?', generator: { type: 'noCarryAdd', max: 20 }, count: 25, timeSec: 90, difficulty: 1.2 },
   { id: 'sub_no_borrow_20', category: '基础入门', name: '20以内不退位减法', desc: '例：16-3=?', generator: { type: 'noBorrowSub', max: 20 }, count: 25, timeSec: 90, difficulty: 1.2 },
