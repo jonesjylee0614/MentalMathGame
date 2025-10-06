@@ -1,4 +1,4 @@
-import { CSSProperties, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { CSSProperties, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { Game } from '../lib/engine';
@@ -37,13 +37,203 @@ export const PlayPage = () => {
   const [playerDamaged, setPlayerDamaged] = useState(false);
   const [showStars, setShowStars] = useState(false);
   const [encouragingMsg, setEncouragingMsg] = useState('');
-  const [showBullet, setShowBullet] = useState(false);
-  const [showZombieBullet, setShowZombieBullet] = useState(false);
-  const [bullets, setBullets] = useState<number[]>([]); // 多个子弹
-  const [zombieBullets, setZombieBullets] = useState<number[]>([]); // 多个僵尸子弹
+  const battleZoneRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const bulletIdRef = useRef(0);
+  const bulletsRef = useRef<
+    Array<{ id: number; type: 'plant' | 'zombie'; spawn: number; duration: number }>
+  >([]);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorListOpen, setErrorListOpen] = useState(false);
   const playSound = useFeedbackSound(settings.audio);
+
+  const scheduleAnimation = useCallback(() => {
+    if (animationFrameRef.current !== null) return;
+
+    const animate = (time: number) => {
+      const canvas = canvasRef.current;
+      const ctx = canvasCtxRef.current;
+
+      if (!canvas || !ctx) {
+        animationFrameRef.current = null;
+        return;
+      }
+
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const nextBullets: typeof bulletsRef.current = [];
+
+      const plantPath = {
+        startX: 0.12 * width,
+        startY: 0.6 * height,
+        endX: 0.88 * width,
+        endY: 0.42 * height,
+        arcHeight: -0.16 * height,
+        color: '#34d399',
+        glow: 'rgba(74, 222, 128, 0.55)',
+        trail: 'rgba(134, 239, 172, 0.55)'
+      } as const;
+
+      const zombiePath = {
+        startX: 0.88 * width,
+        startY: 0.46 * height,
+        endX: 0.16 * width,
+        endY: 0.58 * height,
+        arcHeight: 0.12 * height,
+        color: '#f97316',
+        glow: 'rgba(249, 115, 22, 0.55)',
+        trail: 'rgba(251, 146, 60, 0.55)'
+      } as const;
+
+      const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
+
+      bulletsRef.current.forEach((bullet) => {
+        const elapsed = time - bullet.spawn;
+        if (elapsed <= 0) {
+          nextBullets.push(bullet);
+          return;
+        }
+
+        const progress = Math.min(1, elapsed / bullet.duration);
+        if (progress >= 1) {
+          return;
+        }
+
+        const eased = easeOutCubic(progress);
+        const path = bullet.type === 'plant' ? plantPath : zombiePath;
+
+        const startX = path.startX;
+        const startY = path.startY;
+        const endX = path.endX;
+        const endY = path.endY;
+
+        const x = startX + (endX - startX) * eased;
+        const baseY = startY + (endY - startY) * eased;
+        const y = baseY + Math.sin(eased * Math.PI) * path.arcHeight;
+
+        const tailProgress = Math.max(0, eased - 0.2);
+        const tailX = startX + (endX - startX) * tailProgress;
+        const tailBaseY = startY + (endY - startY) * tailProgress;
+        const tailY = tailBaseY + Math.sin(tailProgress * Math.PI) * path.arcHeight;
+
+        const radius = bullet.type === 'plant' ? 10 + 6 * (1 - eased) : 11 + 4 * (1 - eased);
+
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowColor = path.glow;
+        ctx.shadowBlur = 16;
+
+        ctx.beginPath();
+        ctx.strokeStyle = path.trail;
+        ctx.lineWidth = bullet.type === 'plant' ? 6 : 7;
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        const gradient = ctx.createRadialGradient(x, y, radius * 0.2, x, y, radius);
+        gradient.addColorStop(0, '#ffffff');
+        gradient.addColorStop(1, path.color);
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        nextBullets.push(bullet);
+      });
+
+      bulletsRef.current = nextBullets;
+
+      if (nextBullets.length > 0) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        ctx.clearRect(0, 0, width, height);
+        animationFrameRef.current = null;
+      }
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+  }, []);
+
+  const spawnBullet = useCallback(
+    (type: 'plant' | 'zombie') => {
+      const now = performance.now();
+      const duration = type === 'plant' ? 1200 : 950;
+      bulletsRef.current = [
+        ...bulletsRef.current,
+        { id: bulletIdRef.current++, type, spawn: now, duration }
+      ];
+      scheduleAnimation();
+    },
+    [scheduleAnimation]
+  );
+
+  const setupCanvasSize = useCallback(() => {
+    const canvas = canvasRef.current;
+    const container = battleZoneRef.current;
+    if (!canvas || !container) return;
+
+    const rect = container.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(ratio, ratio);
+    canvasCtxRef.current = ctx;
+    if (bulletsRef.current.length > 0) {
+      scheduleAnimation();
+    }
+  }, [scheduleAnimation]);
+
+  useEffect(() => {
+    setupCanvasSize();
+
+    if (!resizeObserverRef.current && typeof ResizeObserver !== 'undefined') {
+      resizeObserverRef.current = new ResizeObserver(() => setupCanvasSize());
+      if (battleZoneRef.current) {
+        resizeObserverRef.current.observe(battleZoneRef.current);
+      }
+    }
+
+    const handleResize = () => setupCanvasSize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      resizeObserverRef.current?.disconnect();
+      resizeObserverRef.current = null;
+    };
+  }, [setupCanvasSize]);
+
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      bulletsRef.current = [];
+      const canvas = canvasRef.current;
+      const ctx = canvasCtxRef.current;
+      if (canvas && ctx) {
+        ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+      }
+    };
+  }, []);
 
   const handleNumberClick = useCallback(
     (num: string) => {
@@ -134,8 +324,8 @@ export const PlayPage = () => {
         // 连续发射5个子弹，慢慢飞
         [0, 1, 2, 3, 4].forEach((i) => {
           setTimeout(() => {
-            setBullets((prev) => [...prev, Date.now() + i]);
-          }, i * 200); // 每200ms发射一个
+            spawnBullet('plant');
+          }, i * 200);
         });
         
         setTimeout(() => {
@@ -146,15 +336,14 @@ export const PlayPage = () => {
           setPlantAttacking(false);
           setZombieDamaged(false);
           setShowStars(false);
-          setBullets([]);
         }, 2000);
       } else {
         setZombieAttacking(true);
-        
+
         // 连续发射4个僵尸子弹
         [0, 1, 2, 3].forEach((i) => {
           setTimeout(() => {
-            setZombieBullets((prev) => [...prev, Date.now() + i]);
+            spawnBullet('zombie');
           }, i * 180); // 每180ms发射一个
         });
         
@@ -165,7 +354,6 @@ export const PlayPage = () => {
         setTimeout(() => {
           setZombieAttacking(false);
           setPlayerDamaged(false);
-          setZombieBullets([]);
         }, 1200);
       }
     });
@@ -371,15 +559,8 @@ export const PlayPage = () => {
       </header>
 
       {/* 战斗区：角色 + 血条 + 连击 */}
-      <section className={`glass-card ${styles.battleZone}`}>
-        {/* 子弹层 - 在battleRow之外 */}
-        {bullets.map((id) => (
-          <div key={id} className={styles.bullet}>🟢</div>
-        ))}
-        {zombieBullets.map((id) => (
-          <div key={id} className={styles.zombieBullet}>🟤</div>
-        ))}
-        
+      <section ref={battleZoneRef} className={`glass-card ${styles.battleZone}`}>
+        <canvas ref={canvasRef} className={styles.battleCanvas} aria-hidden="true" />
         <div className={styles.battleRow}>
           <div className={styles.characterWrapper}>
             <div className={styles.characterHpTop}>
