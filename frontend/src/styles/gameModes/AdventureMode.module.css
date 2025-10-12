@@ -1,0 +1,454 @@
+/* 探险模式样式 */
+
+.adventureScene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+/* 顶部标题和进度 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+}
+
+.title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  max-width: 300px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  border-radius: 8px;
+  transition: width 0.3s ease-out;
+}
+
+.progressText {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+}
+
+/* 地图容器 */
+.mapContainer {
+  position: relative;
+  flex: 1;
+  background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
+  border-radius: 12px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.3);
+}
+
+/* SVG路径 */
+.pathsSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.path {
+  stroke: rgba(255, 255, 255, 0.2);
+  transition: stroke 0.3s;
+}
+
+.pathUnlocked {
+  stroke: rgba(255, 255, 255, 0.4);
+}
+
+.pathVisited {
+  stroke: #4CAF50;
+  stroke-width: 5;
+  animation: pathGlow 2s infinite;
+}
+
+@keyframes pathGlow {
+  0%, 100% { stroke: #4CAF50; }
+  50% { stroke: #8BC34A; }
+}
+
+/* 地图节点 */
+.mapNode {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  z-index: 2;
+  transition: all 0.3s;
+}
+
+.nodeIcon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s;
+}
+
+.nodeNumber {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* 节点类型样式 */
+.node-start .nodeIcon {
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.4), rgba(76, 175, 80, 0.1));
+  border-color: #4CAF50;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+}
+
+.node-end .nodeIcon {
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.4), rgba(255, 215, 0, 0.1));
+  border-color: #FFD700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  animation: endNodePulse 2s infinite;
+}
+
+@keyframes endNodePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.node-treasure .nodeIcon {
+  border-color: #FFD700;
+  animation: treasureBounce 1s infinite;
+}
+
+@keyframes treasureBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.node-trap .nodeIcon {
+  border-color: #FF5722;
+  animation: trapShake 0.5s infinite;
+}
+
+@keyframes trapShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+.node-boss .nodeIcon {
+  border-color: #E91E63;
+  font-size: 3rem;
+  animation: bossPulse 1s infinite;
+}
+
+@keyframes bossPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(233, 30, 99, 0.5); }
+  50% { box-shadow: 0 0 40px rgba(233, 30, 99, 0.8); }
+}
+
+.node-checkpoint .nodeIcon {
+  border-color: #2196F3;
+}
+
+/* 节点状态 */
+.mapNode.locked .nodeIcon {
+  opacity: 0.4;
+  filter: grayscale(100%);
+}
+
+.mapNode.visited .nodeIcon {
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.3), rgba(76, 175, 80, 0.05));
+  border-color: #4CAF50;
+}
+
+.mapNode.current .nodeIcon {
+  animation: currentNodeGlow 1s infinite;
+}
+
+@keyframes currentNodeGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(33, 150, 243, 0.8);
+    border-color: #2196F3;
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(33, 150, 243, 1);
+    border-color: #64B5F6;
+  }
+}
+
+/* 路障 */
+.obstacle {
+  position: absolute;
+  top: -10px;
+  font-size: 2rem;
+  animation: obstacleShake 0.3s infinite, obstacleFade 1s;
+  z-index: 10;
+}
+
+@keyframes obstacleShake {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+}
+
+@keyframes obstacleFade {
+  from { opacity: 0; transform: scale(0); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 节点标签 */
+.nodeLabel {
+  position: absolute;
+  bottom: -25px;
+  font-size: 0.7rem;
+  color: white;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* 玩家 */
+.player {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  z-index: 3;
+  transition: all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+
+.player.moving {
+  animation: playerWalk 0.6s;
+}
+
+@keyframes playerWalk {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); }
+}
+
+/* 宝箱弹窗 */
+.treasurePopup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #FFD700, #FFA000);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(255, 215, 0, 0.5);
+  animation: treasurePopupAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 100;
+}
+
+@keyframes treasurePopupAppear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) rotate(-180deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+}
+
+.treasureIcon {
+  font-size: 4rem;
+  animation: treasureRotate 1s infinite;
+}
+
+@keyframes treasureRotate {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+}
+
+.treasureText {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 当前节点信息 */
+.currentNodeInfo {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  z-index: 5;
+}
+
+.currentNodeIcon {
+  font-size: 2rem;
+}
+
+.currentNodeText {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+}
+
+/* 反馈提示 */
+.feedback {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: feedbackPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 200;
+}
+
+.feedback.success {
+  background: #4CAF50;
+  color: white;
+}
+
+.feedback.error {
+  background: #f44336;
+  color: white;
+}
+
+@keyframes feedbackPop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.feedbackIcon {
+  font-size: 1.5rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .adventureScene {
+    padding: 0.75rem;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .progress {
+    width: 100%;
+    max-width: none;
+  }
+
+  .nodeIcon {
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+  }
+
+  .nodeNumber {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .player {
+    font-size: 2.5rem;
+  }
+
+  .currentNodeInfo {
+    bottom: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .currentNodeIcon {
+    font-size: 1.5rem;
+  }
+
+  .currentNodeText {
+    font-size: 0.9rem;
+  }
+
+  .treasurePopup {
+    padding: 1rem 1.5rem;
+  }
+
+  .treasureIcon {
+    font-size: 3rem;
+  }
+
+  .treasureText {
+    font-size: 1.2rem;
+  }
+}
+

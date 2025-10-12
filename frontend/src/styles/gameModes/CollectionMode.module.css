@@ -1,0 +1,381 @@
+/* 收集模式样式 */
+
+.collectionScene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  gap: 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 主题标题 */
+.themeTitle {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.themeName {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+}
+
+/* 收集区域 */
+.collectionArea {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 400px;
+  min-height: 200px;
+}
+
+/* 容器 */
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  min-width: 280px;
+  min-height: 180px;
+}
+
+.containerIcon {
+  font-size: 3rem;
+  animation: containerIdle 3s ease-in-out infinite;
+}
+
+@keyframes containerIdle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.containerLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+/* 物品网格 */
+.itemsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  padding: 0.5rem;
+  width: 100%;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.collectedItem {
+  font-size: 2rem;
+  animation: itemAppear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: transform 0.2s;
+}
+
+.collectedItem:hover {
+  transform: scale(1.1);
+}
+
+@keyframes itemAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-180deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* 收集动画 */
+.collectingItem {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 3rem;
+  animation: collectFly 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  pointer-events: none;
+  z-index: 100;
+}
+
+@keyframes collectFly {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100px) scale(0.5);
+  }
+  40% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-20px) scale(1.2);
+  }
+  100% {
+    opacity: 0.5;
+    transform: translateX(-50%) translateY(100px) scale(0.8);
+  }
+}
+
+/* 掉落动画 */
+.droppingItem {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 3rem;
+  animation: itemDrop 0.6s ease-in forwards;
+  pointer-events: none;
+  z-index: 100;
+}
+
+@keyframes itemDrop {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(150px) rotate(180deg);
+  }
+}
+
+/* 进度条 */
+.progressSection {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.progressBar {
+  width: 100%;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  border-radius: 12px;
+  transition: width 0.3s ease-out;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.progressFill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progressText {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.progressPercent {
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* 反馈提示 */
+.feedback {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  animation: feedbackPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 200;
+}
+
+.feedback.success {
+  background: #4CAF50;
+  color: white;
+}
+
+.feedback.error {
+  background: #f44336;
+  color: white;
+}
+
+@keyframes feedbackPop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.feedbackIcon {
+  font-size: 2rem;
+}
+
+.feedbackText {
+  font-size: 1.1rem;
+}
+
+/* 物品展示区 */
+.itemShowcase {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+}
+
+.showcaseLabel {
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 600;
+}
+
+.showcaseItems {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.showcaseItem {
+  font-size: 1.5rem;
+  opacity: 0.8;
+  transition: all 0.2s;
+}
+
+.showcaseItem:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .collectionScene {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .themeName {
+    font-size: 1.2rem;
+    padding: 0.4rem 1rem;
+  }
+
+  .container {
+    min-width: 240px;
+    min-height: 150px;
+  }
+
+  .containerIcon {
+    font-size: 2.5rem;
+  }
+
+  .itemsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .collectedItem {
+    font-size: 1.5rem;
+  }
+
+  .progressText {
+    font-size: 1rem;
+  }
+
+  .feedbackText {
+    font-size: 1rem;
+  }
+
+  .itemShowcase {
+    bottom: 0.5rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .showcaseLabel {
+    font-size: 0.8rem;
+  }
+
+  .showcaseItem {
+    font-size: 1.2rem;
+  }
+}
+
+/* 滚动条美化 */
+.itemsGrid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.itemsGrid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.itemsGrid::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.itemsGrid::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+

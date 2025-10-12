@@ -1,5 +1,20 @@
 export type Operator = '+' | '-' | '×' | '÷';
 
+/**
+ * 游戏模式类型
+ */
+export type GameMode = 
+  | 'battle'      // 战斗模式
+  | 'building'    // 建造模式
+  | 'collection'  // 收集模式
+  | 'racing'      // 赛跑模式
+  | 'puzzle'      // 解密模式
+  | 'farming'     // 种植模式
+  | 'adventure'   // 探险模式
+  | 'defense'     // 防守模式
+  | 'fishing'     // 钓鱼模式
+  | 'cooking';    // 烹饪模式
+
 export interface QuestionMeta {
   [key: string]: unknown;
 }
@@ -27,6 +42,8 @@ export interface Level {
     player?: number;
     monster?: number;
   };
+  gameMode?: GameMode; // 游戏模式（可选，默认为battle）
+  modeConfig?: Record<string, any>; // 模式特定配置
 }
 
 export interface Profile {

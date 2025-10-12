@@ -1,0 +1,717 @@
+/* 钓鱼场景容器 */
+.fishingScene {
+  position: relative;
+  min-height: 500px;
+  padding: 1.5rem;
+  background: linear-gradient(to bottom, 
+    #87CEEB 0%, 
+    #4FC3F7 30%, 
+    #0288D1 60%, 
+    #01579B 100%
+  );
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* 海洋区域 */
+.ocean {
+  position: relative;
+  flex: 1;
+  min-height: 300px;
+  background: linear-gradient(to bottom, 
+    rgba(100, 181, 246, 0.3) 0%,
+    rgba(33, 150, 243, 0.5) 50%,
+    rgba(13, 71, 161, 0.7) 100%
+  );
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 波浪动画 */
+.waves {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  overflow: hidden;
+}
+
+.wave {
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent
+  );
+  animation: wave 10s linear infinite;
+}
+
+.wave1 {
+  animation-duration: 8s;
+  opacity: 0.7;
+}
+
+.wave2 {
+  animation-duration: 10s;
+  animation-delay: 2s;
+  opacity: 0.5;
+}
+
+.wave3 {
+  animation-duration: 12s;
+  animation-delay: 4s;
+  opacity: 0.3;
+}
+
+@keyframes wave {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* 气泡 */
+.bubbles {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+}
+
+.bubble {
+  position: absolute;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+  border-radius: 50%;
+  animation: bubbleFloat 4s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+@keyframes bubbleFloat {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+/* 水纹效果 */
+.rippleEffect {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ripple {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: rippleExpand 1.5s ease-out forwards;
+}
+
+.ripple:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.ripple:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes rippleExpand {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}
+
+/* 钓鱼竿 */
+.fishingRod {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+.rodHandle {
+  font-size: 3rem;
+  transform-origin: bottom center;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.fishingRod.casting .rodHandle {
+  animation: rodCast 1s ease-in-out;
+}
+
+.fishingRod.pulling .rodHandle {
+  animation: rodPull 0.5s ease-in-out;
+}
+
+@keyframes rodCast {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(15deg); }
+}
+
+@keyframes rodPull {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-10deg); }
+}
+
+.rodLine {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 2px;
+  height: 150px;
+  background: linear-gradient(to bottom, #8B4513, transparent);
+  transform: translateX(-50%);
+}
+
+.rodHook {
+  position: absolute;
+  top: calc(100% + 150px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  animation: hookSwing 2s ease-in-out infinite;
+}
+
+@keyframes hookSwing {
+  0%, 100% { transform: translateX(-50%) translateX(-5px); }
+  50% { transform: translateX(-50%) translateX(5px); }
+}
+
+/* 当前鱼 */
+.currentFish {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.fishEmoji {
+  font-size: 4rem;
+  animation: fishAppear 0.5s ease-out;
+}
+
+.currentFish.fishBiting .fishEmoji {
+  animation: fishBite 0.5s ease-in-out;
+}
+
+.currentFish.fishCaught .fishEmoji {
+  animation: fishCatch 1s ease-out forwards;
+}
+
+.currentFish.fishEscaped .fishEmoji {
+  animation: fishEscape 1s ease-out forwards;
+}
+
+@keyframes fishAppear {
+  from {
+    transform: scale(0) translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fishBite {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fishCatch {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3) translateY(-50px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5) translateY(-150px);
+    opacity: 0;
+  }
+}
+
+@keyframes fishEscape {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100px) translateY(50px) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+.fishName {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 20px;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.fishRarity {
+  font-size: 0.8rem;
+  font-weight: normal;
+  margin-top: 0.25rem;
+}
+
+/* 庆祝特效 */
+.celebration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.confetti {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.confettiPiece {
+  position: absolute;
+  top: 20%;
+  width: 10px;
+  height: 10px;
+  animation: confettiFall 2s ease-out forwards;
+}
+
+@keyframes confettiFall {
+  from {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(400px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* 传说特效 */
+.legendaryEffect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.starBurst {
+  position: absolute;
+  font-size: 3rem;
+  animation: starExpand 1.5s ease-out forwards;
+}
+
+.starBurst:nth-child(1) {
+  top: -50px;
+  left: 0;
+}
+
+.starBurst:nth-child(2) {
+  top: 0;
+  left: 50px;
+}
+
+.starBurst:nth-child(3) {
+  top: 50px;
+  left: 0;
+}
+
+.starBurst:nth-child(4) {
+  top: 0;
+  left: -50px;
+}
+
+@keyframes starExpand {
+  from {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(2) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+/* 逃跑特效 */
+.escapeEffect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.escapeText {
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  animation: escapeFade 1.5s ease-out forwards;
+}
+
+@keyframes escapeFade {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+}
+
+/* 统计面板 */
+.statsPanel {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.statBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.statBox.comboActive {
+  background: rgba(255, 152, 0, 0.3);
+  border: 2px solid #ff9800;
+  animation: comboPulse 1s ease-in-out infinite;
+}
+
+@keyframes comboPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.statLabel {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+}
+
+/* 进度条 */
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progressBar {
+  position: relative;
+  width: 100%;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.progressFill {
+  position: relative;
+  height: 100%;
+  background: linear-gradient(90deg, #4FC3F7, #0288D1, #01579B);
+  border-radius: 15px;
+  transition: width 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 5px;
+}
+
+.progressEmoji {
+  font-size: 1.2rem;
+  animation: progressSwim 1s ease-in-out infinite;
+}
+
+@keyframes progressSwim {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(-3px) rotate(-5deg); }
+}
+
+.progressLabel {
+  text-align: center;
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 600;
+}
+
+/* 稀有度统计 */
+.rarityStats {
+  display: flex;
+  justify-content: space-around;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.rarityItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rarityDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.rarityLabel {
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 500;
+}
+
+/* 鱼篓 */
+.fishBasket {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(101, 67, 33, 0.6);
+  border: 2px solid rgba(139, 69, 19, 0.8);
+  border-radius: 8px;
+}
+
+.basketHeader {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+}
+
+.basketContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.basketFish {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+  animation: basketFishPop 0.5s ease-out;
+}
+
+@keyframes basketFishPop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.basketFish:hover {
+  transform: scale(1.1);
+}
+
+.basketFishEmoji {
+  font-size: 2rem;
+}
+
+.basketFishScore {
+  font-size: 0.75rem;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.emptyBasket {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+/* 反馈消息 */
+.feedback {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  animation: feedbackSlideDown 0.3s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  max-width: 90%;
+  text-align: center;
+}
+
+.feedback.success {
+  background: linear-gradient(135deg, #4caf50, #8bc34a);
+  color: white;
+}
+
+.feedback.failure {
+  background: linear-gradient(135deg, #ff5722, #ff9800);
+  color: white;
+}
+
+@keyframes feedbackSlideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* 提示信息 */
+.hints {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+}
+
+/* 滚动条美化 */
+.basketContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.basketContent::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.basketContent::-webkit-scrollbar-thumb {
+  background: rgba(139, 69, 19, 0.8);
+  border-radius: 3px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .fishingScene {
+    min-height: 450px;
+    padding: 1rem;
+  }
+
+  .ocean {
+    min-height: 250px;
+  }
+
+  .rodHandle {
+    font-size: 2.5rem;
+  }
+
+  .fishEmoji {
+    font-size: 3rem;
+  }
+
+  .statsPanel {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statValue {
+    font-size: 1.2rem;
+  }
+
+  .rarityStats {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .basketContent {
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    max-height: 120px;
+  }
+
+  .basketFishEmoji {
+    font-size: 1.5rem;
+  }
+
+  .feedback {
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+  }
+}

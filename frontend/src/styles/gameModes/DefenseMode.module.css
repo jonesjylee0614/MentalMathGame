@@ -1,0 +1,577 @@
+/* 防守场景容器 */
+.defenseScene {
+  position: relative;
+  min-height: 450px;
+  padding: 1.5rem;
+  background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* 战场区域 */
+.battlefield {
+  position: relative;
+  flex: 1;
+  min-height: 300px;
+  background: linear-gradient(to right, 
+    rgba(139, 69, 19, 0.3) 0%, 
+    rgba(101, 67, 33, 0.2) 50%, 
+    rgba(139, 69, 19, 0.3) 100%
+  );
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 路径指示线 */
+.pathLine {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, 
+    rgba(255, 215, 0, 0.5), 
+    rgba(255, 140, 0, 0.3), 
+    rgba(255, 69, 0, 0.5)
+  );
+  transform: translateY(-50%);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* 城堡（左侧） */
+.castle {
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.castle.damaged {
+  animation: castleShake 0.5s ease;
+}
+
+@keyframes castleShake {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  25% { transform: translateY(-50%) translateX(-10px); }
+  75% { transform: translateY(-50%) translateX(10px); }
+}
+
+.castleIcon {
+  font-size: 4rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  transition: filter 0.3s ease;
+}
+
+.castle.safe .castleIcon {
+  filter: drop-shadow(0 4px 8px rgba(76, 175, 80, 0.5));
+}
+
+.castle.warning .castleIcon {
+  filter: drop-shadow(0 4px 8px rgba(255, 152, 0, 0.5));
+}
+
+.castle.critical .castleIcon {
+  filter: drop-shadow(0 4px 8px rgba(244, 67, 54, 0.5));
+  animation: castleCritical 1s ease-in-out infinite;
+}
+
+@keyframes castleCritical {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* 城堡血条 */
+.castleHP {
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.hpBar {
+  width: 100%;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.hpFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #8bc34a);
+  transition: width 0.5s ease, background 0.3s ease;
+  border-radius: 10px;
+}
+
+.castle.warning .hpFill {
+  background: linear-gradient(90deg, #ff9800, #ffc107);
+}
+
+.castle.critical .hpFill {
+  background: linear-gradient(90deg, #f44336, #e91e63);
+  animation: hpPulse 1s ease-in-out infinite;
+}
+
+@keyframes hpPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.hpText {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: white;
+}
+
+/* 危险警告 */
+.criticalAlert {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  background: rgba(244, 67, 54, 0.9);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  animation: alertBounce 0.5s ease-in-out infinite;
+  white-space: nowrap;
+}
+
+@keyframes alertBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* 防御塔 */
+.defenderTower {
+  position: absolute;
+  left: 35%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.towerIcon {
+  font-size: 3rem;
+  filter: drop-shadow(0 4px 8px rgba(100, 181, 246, 0.5));
+}
+
+.towerLabel {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
+/* 敌人层 */
+.enemiesLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.enemy {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  transition: left 1s linear, opacity 0.5s ease;
+}
+
+.enemy.defeated {
+  opacity: 0;
+  transform: translateY(-50%) scale(0);
+}
+
+.enemyIcon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  animation: enemyWalk 1s ease-in-out infinite;
+}
+
+@keyframes enemyWalk {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.enemyQuestion {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+/* 激光射击效果 */
+.laserBeam {
+  position: absolute;
+  top: 50%;
+  left: 35%;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, 
+    rgba(0, 255, 255, 0.8), 
+    rgba(0, 191, 255, 0.6),
+    transparent
+  );
+  transform: translateY(-50%);
+  animation: laserFire 0.5s ease-out;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+@keyframes laserFire {
+  from {
+    opacity: 1;
+    right: 65%;
+  }
+  to {
+    opacity: 0;
+    right: 0;
+  }
+}
+
+/* 爆炸效果 */
+.explosion {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  animation: explode 1s ease-out forwards;
+  z-index: 10;
+}
+
+@keyframes explode {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+/* 受伤特效 */
+.damageEffect {
+  position: absolute;
+  left: 5%;
+  top: 30%;
+  z-index: 5;
+}
+
+.damageText {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #f44336;
+  text-shadow: 0 0 10px rgba(244, 67, 54, 0.8);
+  animation: damageFloat 1s ease-out forwards;
+}
+
+@keyframes damageFloat {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+}
+
+/* 状态栏 */
+.statusBar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.statusItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.statusLabel {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.statusValue {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+}
+
+.statusValue.safe {
+  color: #4caf50;
+}
+
+.statusValue.warning {
+  color: #ff9800;
+}
+
+.statusValue.critical {
+  color: #f44336;
+  animation: textPulse 1s ease-in-out infinite;
+}
+
+@keyframes textPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* 进度条 */
+.progressBar {
+  position: relative;
+  flex: 1;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #2196f3, #64b5f6);
+  transition: width 0.5s ease;
+  border-radius: 12px;
+}
+
+.progressText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* 操作提示 */
+.actionHint {
+  text-align: center;
+  padding: 0.75rem;
+  background: rgba(255, 152, 0, 0.2);
+  border: 2px solid rgba(255, 152, 0, 0.5);
+  border-radius: 8px;
+  color: #ffc107;
+  font-weight: bold;
+  animation: hintPulse 2s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* 反馈消息 */
+.feedback {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  animation: feedbackSlideDown 0.3s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.feedback.correct {
+  background: linear-gradient(135deg, #4caf50, #8bc34a);
+  color: white;
+}
+
+.feedback.wrong {
+  background: linear-gradient(135deg, #ff5722, #ff9800);
+  color: white;
+}
+
+@keyframes feedbackSlideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.feedbackIcon {
+  font-size: 1.5rem;
+}
+
+/* 胜利横幅 */
+.victoryBanner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  animation: bannerFadeIn 0.5s ease-out;
+}
+
+@keyframes bannerFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.victoryContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: victoryBounce 1s ease-out;
+}
+
+@keyframes victoryBounce {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.victoryIcon {
+  font-size: 6rem;
+  animation: victoryRotate 2s ease-in-out infinite;
+}
+
+@keyframes victoryRotate {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(15deg); }
+}
+
+.victoryText {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+}
+
+.victorySubtext {
+  font-size: 1.5rem;
+  color: #4caf50;
+}
+
+/* 战斗信息 */
+.battleInfo {
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.infoRow {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .defenseScene {
+    min-height: 380px;
+    padding: 1rem;
+  }
+
+  .battlefield {
+    min-height: 250px;
+  }
+
+  .castleIcon {
+    font-size: 3rem;
+  }
+
+  .castleHP {
+    width: 100px;
+  }
+
+  .towerIcon {
+    font-size: 2.5rem;
+  }
+
+  .enemyIcon {
+    font-size: 2rem;
+  }
+
+  .statusBar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .statusItem {
+    font-size: 0.8rem;
+  }
+
+  .victoryText {
+    font-size: 2rem;
+  }
+
+  .victorySubtext {
+    font-size: 1.2rem;
+  }
+
+  .battleInfo {
+    font-size: 0.75rem;
+  }
+
+  .feedback {
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+  }
+}

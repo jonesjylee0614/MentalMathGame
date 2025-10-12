@@ -1,0 +1,354 @@
+/* 建造模式样式 */
+
+.buildingScene {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3rem;
+  padding: 2rem;
+  min-height: 300px;
+  background: linear-gradient(to bottom, #87ceeb 0%, #e0f6ff 100%);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* 目标建筑 */
+.targetBuilding {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.targetIcon {
+  font-size: 3rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+.targetLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* 进度条 */
+.buildingProgress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.progressBar {
+  position: relative;
+  width: 60px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 3px solid #333;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+.progressFill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, #4caf50, #8bc34a);
+  transition: height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 0 27px 27px;
+}
+
+.progressText {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.progressLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+}
+
+.progressCount {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.progressDesc {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* 积木容器 */
+.blocksContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 200px;
+  min-height: 250px;
+}
+
+.blockStack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 200px;
+}
+
+.block {
+  position: absolute;
+  font-size: 3rem;
+  animation: blockFlyIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  transform-origin: center bottom;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes blockFlyIn {
+  0% {
+    transform: translateY(200px) scale(0.5) rotate(-10deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-10px) scale(1.1) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* 积木抖动动画 */
+.block.shake {
+  animation: blockShake 0.6s ease-in-out;
+}
+
+@keyframes blockShake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px) rotate(-5deg); }
+  20%, 40%, 60%, 80% { transform: translateX(10px) rotate(5deg); }
+}
+
+/* 地基 */
+.foundation {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ground {
+  font-size: 1.5rem;
+  color: #8b4513;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: -2px;
+}
+
+/* 反馈提示 */
+.feedback {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: feedbackPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 10;
+}
+
+.feedback.correct {
+  background: linear-gradient(135deg, #4caf50, #8bc34a);
+  color: white;
+}
+
+.feedback.wrong {
+  background: linear-gradient(135deg, #f44336, #ff6b6b);
+  color: white;
+}
+
+.feedbackIcon {
+  font-size: 2rem;
+}
+
+.feedbackText {
+  font-size: 1.2rem;
+}
+
+@keyframes feedbackPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* 完成庆祝 */
+.completionOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlayFadeIn 0.5s ease-out;
+  z-index: 20;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.completionBanner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: bannerBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bannerBounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.completionIcon {
+  font-size: 5rem;
+  animation: iconSpin 1s ease-out;
+}
+
+@keyframes iconSpin {
+  0% { transform: rotate(0deg) scale(0); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.completionText {
+  font-size: 2.5rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.fireworks {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.firework {
+  font-size: 3rem;
+  animation: fireworkExplode 1s ease-out infinite;
+}
+
+.firework:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.firework:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.firework:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes fireworkExplode {
+  0% {
+    transform: scale(0.5) translateY(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.5) translateY(-20px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(-10px);
+    opacity: 0.5;
+  }
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .buildingScene {
+    gap: 1.5rem;
+    padding: 1rem;
+    min-height: 250px;
+  }
+
+  .targetIcon {
+    font-size: 2rem;
+  }
+
+  .progressBar {
+    width: 40px;
+    height: 150px;
+  }
+
+  .block {
+    font-size: 2rem;
+  }
+
+  .completionText {
+    font-size: 1.8rem;
+  }
+}
+

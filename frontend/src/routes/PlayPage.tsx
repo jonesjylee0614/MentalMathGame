@@ -6,19 +6,10 @@ import { findLevel } from '../lib/levels';
 import { formatTime } from '../lib/utils';
 import { useFeedbackSound } from '../lib/sound';
 import { GameResult, GameSnapshot, Question } from '../lib/types';
-import { useProjectileAnimations } from '../hooks/useProjectileAnimations';
+import { GameModeManager } from '../lib/gameModes/GameModeManager';
+import { IGameMode, GameModeState } from '../lib/gameModes/IGameMode';
+import { EventBus } from '../lib/eventBus';
 import styles from '../styles/PlayPage.module.css';
-
-const encouragingMessages = [
-  '✅ 太棒了！答对啦！',
-  '🌟 你真聪明！',
-  '🎉 太厉害了！',
-  '💪 做得好！',
-  '👏 完美答案！',
-  '🚀 你是数学小天才！',
-  '⭐ 真棒！继续加油！',
-  '🎯 正确！太准了！',
-];
 
 export const PlayPage = () => {
   const { levelId } = useParams();
@@ -32,20 +23,11 @@ export const PlayPage = () => {
   const [answer, setAnswer] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const [plantAttacking, setPlantAttacking] = useState(false);
-  const [zombieAttacking, setZombieAttacking] = useState(false);
-  const [zombieDamaged, setZombieDamaged] = useState(false);
-  const [playerDamaged, setPlayerDamaged] = useState(false);
-  const [showStars, setShowStars] = useState(false);
-  const [encouragingMsg, setEncouragingMsg] = useState('');
-  const {
-    plantProjectiles,
-    zombieProjectiles,
-    firePlantBurst,
-    fireZombieBurst,
-    clearPlantProjectiles,
-    clearZombieProjectiles,
-  } = useProjectileAnimations();
+  
+  // 游戏模式状态
+  const [gameMode, setGameMode] = useState<IGameMode | null>(null);
+  const [modeState, setModeState] = useState<GameModeState | null>(null);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorListOpen, setErrorListOpen] = useState(false);
   const playSound = useFeedbackSound(settings.audio);
@@ -78,6 +60,35 @@ export const PlayPage = () => {
       setError('未找到关卡，返回关卡列表');
       return;
     }
+
+    // 创建事件总线
+    const eventBus = new EventBus();
+    
+    // 创建音效播放器
+    const soundPlayer = {
+      play: (sound: 'success' | 'error') => playSound(sound)
+    };
+
+    // 创建游戏模式实例
+    const modeId = level.gameMode || 'battle';
+    const manager = GameModeManager.getInstance();
+    
+    const mode = manager.create(
+      modeId,
+      {
+        level,
+        modeConfig: level.modeConfig,
+        settings
+      },
+      {
+        engine: Game,
+        eventBus,
+        soundPlayer
+      }
+    );
+
+    manager.activate(mode);
+    setGameMode(mode);
 
     // Keyboard shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -112,60 +123,50 @@ export const PlayPage = () => {
 
     window.addEventListener('keydown', handleKeyDown);
 
+    // 监听游戏引擎事件并转发给游戏模式
     const unsubState = Game.on('statechange', ({ state: nextState }) => setState(nextState));
+    
     const unsubQuestion = Game.on('question', (next) => {
       setQuestion(next);
-      // Don't clear answer here - wait for user to see result
-      setFeedback(null); // Clear feedback when moving to next question
+      setFeedback(null);
     });
-    const unsubUpdate = Game.on('update', (snap) => setSnapshot(snap));
+    
+    const unsubUpdate = Game.on('update', (snap) => {
+      setSnapshot(snap);
+      mode.onUpdate(snap);
+      setModeState(mode.getState());
+    });
+    
     const unsubFeedback = Game.on('feedback', (fb) => {
       setFeedback(fb);
-      playSound(fb.correct ? 'success' : 'error');
-
+      
       // Clear answer after a short delay to let user see the result
       setTimeout(() => {
         setAnswer('');
-        setIsSubmitting(false); // 重置提交状态，允许下一题输入
+        setIsSubmitting(false);
       }, 800);
 
-      // Trigger animations
-      if (fb.correct) {
-        const randomMsg = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
-        setEncouragingMsg(randomMsg);
-        setPlantAttacking(true);
-        setShowStars(true);
-        
-        firePlantBurst();
-
-        setTimeout(() => {
-          setZombieDamaged(true);
-        }, 600);
-
-        setTimeout(() => {
-          setPlantAttacking(false);
-          setZombieDamaged(false);
-          setShowStars(false);
-          clearPlantProjectiles();
-        }, 2000);
-      } else {
-        setZombieAttacking(true);
-
-        fireZombieBurst();
-
-        setTimeout(() => {
-          setPlayerDamaged(true);
-        }, 500);
-
-        setTimeout(() => {
-          setZombieAttacking(false);
-          setPlayerDamaged(false);
-          clearZombieProjectiles();
-        }, 1200);
+      const currentQuestion = Game.getCurrentQuestion();
+      const currentSnapshot = snapshot || Game.snapshot();
+      
+      // 将反馈转发给游戏模式
+      if (fb.correct && currentQuestion) {
+        mode.onCorrectAnswer(currentQuestion, currentSnapshot);
+      } else if (!fb.correct && currentQuestion) {
+        mode.onWrongAnswer(
+          currentQuestion,
+          currentSnapshot,
+          answer,
+          fb.expected || ''
+        );
       }
+      
+      setModeState(mode.getState());
     });
+    
     const unsubFinish = Game.on('finish', (result) => {
       if (!level) return;
+      mode.onGameEnd(result);
       const enriched: GameResult & { levelId: string } = {
         ...result,
         levelId: level.id,
@@ -176,8 +177,11 @@ export const PlayPage = () => {
       navigate('/result');
     });
 
+    // 启动游戏
     Game.init(level);
+    mode.onGameStart(level.count);
     Game.start();
+    setModeState(mode.getState());
     setError(null);
 
     return () => {
@@ -187,9 +191,10 @@ export const PlayPage = () => {
       unsubUpdate();
       unsubFeedback();
       unsubFinish();
+      manager.deactivate();
       Game.reset();
     };
-  }, [level, navigate, playSound, recordResult, setLastResult]);
+  }, [level, navigate, playSound, recordResult, setLastResult, settings]);
 
   if (!level) {
     return (
@@ -365,55 +370,24 @@ export const PlayPage = () => {
         <span className={styles.motivationalText}>{motivationalMessage}</span>
       </header>
 
-      {/* 战斗区：角色 + 血条 + 连击 */}
-      <section className={`glass-card ${styles.battleZone}`}>
-        {/* 子弹层 - 在battleRow之外 */}
-        {plantProjectiles.map((id) => (
-          <div key={id} className={styles.bullet}>🟢</div>
-        ))}
-        {zombieProjectiles.map((id) => (
-          <div key={id} className={styles.zombieBullet}>🟤</div>
-        ))}
-        
-        <div className={styles.battleRow}>
-          <div className={styles.characterWrapper}>
-            <div className={styles.characterHpTop}>
-              <div className={styles.hpBar}>
-                <div
-                  className={`${styles.hpFill} ${playerDamaged ? styles.hpDamaged : ''}`}
-                  style={{ width: `${playerHpPercent}%` }}
-                />
-              </div>
-              <span className={styles.hpLabel}>{playerHpPercent}%</span>
-            </div>
-            <span className={`${styles.characterIcon} ${plantAttacking ? styles.attacking : ''}`}>🌻</span>
-          </div>
-
-          {snapshot && snapshot.combo > 0 && (
-            <div className={styles.comboBadge}>
-              🔥 连击 x{snapshot.combo}
-            </div>
-          )}
-
-          <div className={styles.characterWrapper}>
-            <div className={styles.characterHpTop}>
-              <div className={styles.hpBar}>
-                <div
-                  className={`${styles.hpFill} ${styles.enemy} ${zombieDamaged ? styles.hpDamaged : ''}`}
-                  style={{ width: `${monsterHpPercent}%` }}
-                />
-              </div>
-              <span className={styles.hpLabel}>{monsterHpPercent}%</span>
-            </div>
-            <span className={`${styles.characterIcon} ${zombieAttacking ? styles.attacking : ''}`}>🧟</span>
-          </div>
-        </div>
-      </section>
+      {/* 游戏模式区：动态渲染不同的游戏模式 */}
+      {gameMode && modeState && snapshot && (
+        (() => {
+          const ModeComponent = gameMode.getComponent();
+          return (
+            <ModeComponent
+              state={modeState}
+              snapshot={snapshot}
+              question={question}
+              feedback={feedback}
+            />
+          );
+        })()
+      )}
 
       {/* 主区：题目(左) + 输入区(右) */}
       <main className={styles.stage}>
         <div className={`glass-card ${styles.questionPanel}`}>
-          {showStars && <div className={styles.starBurst} aria-hidden="true" />}
           <div className={styles.questionHeader}>
             <span className={styles.questionIndex}>第 {currentQuestion || 1} 题</span>
           </div>
@@ -443,7 +417,9 @@ export const PlayPage = () => {
                   {feedback.correct ? (
                     <>
                       <div className={styles.feedbackTitle}>答对了！！！</div>
-                      <div className={styles.feedbackMsg}>{encouragingMsg}</div>
+                      <div className={styles.feedbackMsg}>
+                        {modeState?.data?.encouragingMsg || '太棒了！'}
+                      </div>
                     </>
                   ) : (
                     <>

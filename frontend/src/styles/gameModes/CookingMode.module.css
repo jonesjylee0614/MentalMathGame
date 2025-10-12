@@ -1,0 +1,608 @@
+/* 烹饪模式样式 */
+
+.cookingZone {
+  position: relative;
+  padding: 1.5rem;
+  min-height: 320px;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #ffeaa7 100%);
+  overflow: hidden;
+}
+
+.recipeTitle {
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #2d3436;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+  animation: titleBounce 2s ease-in-out infinite;
+}
+
+/* 厨房场景 */
+.kitchen {
+  position: relative;
+  height: 160px;
+  background: linear-gradient(180deg, 
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.5) 100%
+  );
+  border-radius: 16px;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 炊具/锅 */
+.cookware {
+  position: relative;
+  font-size: 5rem;
+  z-index: 10;
+  filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.2));
+  transition: transform 0.3s ease;
+}
+
+.cookware.shake {
+  animation: cookwareShake 0.5s ease-in-out;
+}
+
+/* 闪光效果 */
+.sparkles {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  animation: sparkleFloat 1.5s ease-in-out infinite;
+}
+
+.sparkles span {
+  font-size: 1.5rem;
+  animation: sparkleRotate 2s linear infinite;
+}
+
+.sparkles span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.sparkles span:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.sparkles span:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.sparkles span:nth-child(4) {
+  animation-delay: 0.9s;
+}
+
+/* 蒸汽效果 */
+.steam {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+  z-index: 15;
+}
+
+.steam span {
+  font-size: 2rem;
+  animation: steamRise 2s ease-in-out infinite;
+  opacity: 0;
+}
+
+.steam span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.steam span:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.steam span:nth-child(3) {
+  animation-delay: 1s;
+}
+
+/* 当前食材 */
+.currentIngredient {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: 3rem;
+  z-index: 20;
+  filter: drop-shadow(2px 2px 6px rgba(0, 0, 0, 0.3));
+  animation: ingredientIdle 2s ease-in-out infinite;
+}
+
+.currentIngredient.flying {
+  animation: ingredientFly 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.currentIngredient.burned {
+  animation: ingredientBurn 1s ease-out;
+  filter: grayscale(0.8) contrast(1.5);
+}
+
+.burnEffect {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 1.5rem;
+  animation: fireBurn 0.5s ease-in-out;
+}
+
+/* 锅中的食材 */
+.ingredientsInPot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 5px;
+  z-index: 8;
+}
+
+.ingredientInPot {
+  font-size: 2rem;
+  animation: ingredientBounce 1s ease-in-out infinite;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* 进度区域 */
+.progressSection {
+  margin-top: 1rem;
+}
+
+.progressLabel {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #2d3436;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.progressBar {
+  height: 24px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(45, 52, 54, 0.2);
+  position: relative;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b6b 0%, #ee5a6f 50%, #ff4757 100%);
+  transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.progressFill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: progressShine 2s ease-in-out infinite;
+}
+
+.progressFill.complete {
+  background: linear-gradient(90deg, #55efc4 0%, #00b894 50%, #00cec9 100%);
+  animation: progressComplete 0.8s ease-out;
+}
+
+.progressPercent {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #2d3436;
+  margin-top: 0.25rem;
+}
+
+/* 食材列表 */
+.ingredientsList {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0.75rem;
+  border-radius: 12px;
+}
+
+.ingredientsLabel {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #2d3436;
+  margin-bottom: 0.5rem;
+}
+
+.ingredientsGrid {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ingredientCard {
+  position: relative;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 2px solid rgba(45, 52, 54, 0.2);
+  transition: all 0.3s ease;
+}
+
+.ingredientCard.used {
+  background: rgba(85, 239, 196, 0.5);
+  border-color: #00b894;
+  transform: scale(0.95);
+}
+
+.ingredientIcon {
+  font-size: 1.8rem;
+}
+
+.ingredientCount {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4757;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 0.15rem 0.35rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 烹饪消息 */
+.cookingMsg {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  color: #2d3436;
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  z-index: 50;
+  animation: msgAppear 0.5s ease-out;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 2px solid #ffeaa7;
+}
+
+.cookingMsg.complete {
+  background: linear-gradient(135deg, #ffeaa7 0%, #ffeb3b 100%);
+  font-size: 1.3rem;
+  animation: msgCelebrate 1s ease-out infinite;
+}
+
+/* 答题反馈 */
+.feedback {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  z-index: 50;
+  animation: feedbackSlide 0.5s ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.feedback.correct {
+  background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+  color: white;
+}
+
+.feedback.wrong {
+  background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+  color: white;
+}
+
+/* 完成横幅 */
+.completeBanner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 2rem 3rem;
+  border-radius: 20px;
+  text-align: center;
+  z-index: 100;
+  animation: bannerAppear 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  border: 4px solid #ffeaa7;
+}
+
+.completeDish {
+  font-size: 6rem;
+  margin-bottom: 0.5rem;
+  animation: dishRotate 2s ease-in-out infinite;
+}
+
+.completeText {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #2d3436;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.completeStars {
+  font-size: 2rem;
+  animation: starsGlow 1.5s ease-in-out infinite;
+}
+
+/* 动画定义 */
+@keyframes titleBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes cookwareShake {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-10px) rotate(-3deg);
+  }
+  75% {
+    transform: translateX(10px) rotate(3deg);
+  }
+}
+
+@keyframes sparkleFloat {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-15px);
+  }
+}
+
+@keyframes sparkleRotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes steamRise {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-80px);
+    opacity: 0;
+  }
+}
+
+@keyframes ingredientIdle {
+  0%, 100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+@keyframes ingredientFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(50vw - 100px), -50px) scale(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(50vw - 100px), 0) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes ingredientBurn {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.2) rotate(-10deg);
+  }
+  75% {
+    transform: scale(1.2) rotate(10deg);
+  }
+}
+
+@keyframes fireBurn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes ingredientBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes progressShine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes progressComplete {
+  0% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(1.05);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes msgAppear {
+  0% {
+    transform: translateX(-50%) translateY(-30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes msgCelebrate {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+
+@keyframes feedbackSlide {
+  0% {
+    transform: translateX(-50%) translateY(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bannerAppear {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes dishRotate {
+  0%, 100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes starsGlow {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(255, 235, 59, 0.5);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 235, 59, 1);
+    transform: scale(1.1);
+  }
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .cookingZone {
+    padding: 1rem;
+    min-height: 280px;
+  }
+
+  .recipeTitle {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .kitchen {
+    height: 120px;
+  }
+
+  .cookware {
+    font-size: 4rem;
+  }
+
+  .currentIngredient {
+    font-size: 2.5rem;
+    top: 15px;
+    left: 15px;
+  }
+
+  .ingredientInPot {
+    font-size: 1.5rem;
+  }
+
+  .ingredientIcon {
+    font-size: 1.5rem;
+  }
+
+  .completeBanner {
+    padding: 1.5rem 2rem;
+  }
+
+  .completeDish {
+    font-size: 4rem;
+  }
+
+  .completeText {
+    font-size: 1.4rem;
+  }
+
+  .completeStars {
+    font-size: 1.5rem;
+  }
+}
+
