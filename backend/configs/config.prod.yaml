@@ -1,0 +1,31 @@
+# Production Configuration
+
+server:
+  mode: release
+  port: 8080
+
+database:
+  host: your-db-host
+  port: 3306
+  username: your-db-user
+  password: your-db-password
+  database: mental_math_game
+  max_idle_conns: 10
+  max_open_conns: 100
+
+redis:
+  host: your-redis-host
+  port: 6379
+  password: your-redis-password
+
+jwt:
+  secret: your-production-jwt-secret-key-must-be-strong
+
+cors:
+  allowed_origins:
+    - https://your-domain.com
+
+log:
+  level: info
+  filename: /var/log/mental-math-game/app.log
+

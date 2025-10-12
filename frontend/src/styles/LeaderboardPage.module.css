@@ -1,0 +1,147 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+}
+
+.card h1 {
+  margin: 0 0 30px 0;
+  color: #333;
+  text-align: center;
+}
+
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 600;
+}
+
+.tabs button.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.filters {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.filters select {
+  padding: 10px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f8f8f8;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.item:hover {
+  background: #f0f0f0;
+}
+
+.rank {
+  width: 40px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: #667eea;
+}
+
+.medal1, .medal2, .medal3 {
+  font-size: 24px;
+}
+
+.user {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user span {
+  font-weight: 600;
+  color: #333;
+}
+
+.score {
+  font-size: 20px;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.myRank {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.myRank h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .tabs {
+    flex-direction: column;
+  }
+  
+  .item {
+    font-size: 14px;
+  }
+  
+  .user img {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+
