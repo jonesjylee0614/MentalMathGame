@@ -42,8 +42,14 @@ export interface Level {
     player?: number;
     monster?: number;
   };
-  gameMode?: GameMode; // 游戏模式（可选，默认为battle）
-  modeConfig?: Record<string, any>; // 模式特定配置
+  
+  // 🔧 新设计：支持多种游戏模式
+  recommendedModes?: GameMode[]; // 推荐的游戏模式（可多个）
+  defaultMode?: GameMode;        // 默认模式（用户未选择时使用）
+  modeConfig?: Record<string, any>; // 模式特定配置，可以针对不同模式设置不同配置
+  
+  // ⚠️ 向后兼容：保留旧字段，但优先使用新字段
+  gameMode?: GameMode; // @deprecated 使用 defaultMode 代替
 }
 
 export interface Profile {

@@ -2,22 +2,220 @@ import { Level } from './types';
 
 export const LEVELS: Level[] = [
   // 基础入门：5 内与 10 内
-  { id: 'add_1_5', category: '基础入门', name: '5以内的加法', desc: '例：2+3=?', generator: { type: 'addsub', ops: ['+'], max: 5 }, count: 20, timeSec: 300, difficulty: 1.0, gameMode: 'building', modeConfig: { buildingType: 'tower' } },
-  { id: 'sub_1_5', category: '基础入门', name: '5以内的减法', desc: '例：4-2=?', generator: { type: 'addsub', ops: ['-'], max: 5 }, count: 20, timeSec: 300, difficulty: 1.0, gameMode: 'fishing', modeConfig: {} },
-  { id: 'addsub_1_5', category: '基础入门', name: '5以内的加减法', desc: '加减混合', generator: { type: 'addsub', ops: ['+', '-'], max: 5 }, count: 20, timeSec: 300, difficulty: 1.1, gameMode: 'fishing', modeConfig: {} },
-  { id: 'add_1_10', category: '基础入门', name: '10以内的加法', desc: '例：6+3=?', generator: { type: 'addsub', ops: ['+'], max: 10 }, count: 25, timeSec: 300, difficulty: 1.1, gameMode: 'building', modeConfig: { buildingType: 'tower' } },
-  { id: 'sub_1_10', category: '基础入门', name: '10以内的减法', desc: '例：6-3=?', generator: { type: 'addsub', ops: ['-'], max: 10 }, count: 25, timeSec: 300, difficulty: 1.1, gameMode: 'fishing', modeConfig: {} },
-  { id: 'addsub_1_10', category: '基础入门', name: '10以内的加减法', desc: '加减混合', generator: { type: 'addsub', ops: ['+', '-'], max: 10 }, count: 25, timeSec: 300, difficulty: 1.2, gameMode: 'fishing', modeConfig: {} },
-  { id: 'fill_1_10', category: '基础入门', name: '10以内的填括号', desc: '例：4-？=1', generator: { type: 'fill', mode: 'within10' }, count: 20, timeSec: 80, difficulty: 1.2, gameMode: 'collection', modeConfig: { theme: 'fruit' } },
-  { id: 'add_no_carry_20', category: '基础入门', name: '20以内不进位加法', desc: '例：16+3=?', generator: { type: 'noCarryAdd', max: 20 }, count: 25, timeSec: 90, difficulty: 1.2, gameMode: 'fishing', modeConfig: {} },
-  { id: 'sub_no_borrow_20', category: '基础入门', name: '20以内不退位减法', desc: '例：16-3=?', generator: { type: 'noBorrowSub', max: 20 }, count: 25, timeSec: 90, difficulty: 1.2, gameMode: 'fishing', modeConfig: {} },
-  { id: 'make10', category: '基础入门', name: '凑10练习', desc: '例：？+8=10', generator: { type: 'make10' }, count: 20, timeSec: 60, difficulty: 1.1, gameMode: 'fishing', modeConfig: {} },
-  { id: 'add_carry_20', category: '基础入门', name: '20以内进位加法', desc: '例：8+8=?', generator: { type: 'carryAdd', max: 20 }, count: 25, timeSec: 90, difficulty: 1.3, gameMode: 'cooking' },
-  { id: 'sub_borrow_20', category: '基础入门', name: '20以内退位减法', desc: '例：15-7=?', generator: { type: 'borrowSub', max: 20 }, count: 25, timeSec: 90, difficulty: 1.3, gameMode: 'cooking' },
-  { id: 'add_20', category: '基础入门', name: '20以内的加法', desc: '例：15+3=?', generator: { type: 'addsub', ops: ['+'], max: 20 }, count: 25, timeSec: 90, difficulty: 1.2, gameMode: 'building', modeConfig: { buildingType: 'tower' } },
-  { id: 'sub_20', category: '基础入门', name: '20以内的减法', desc: '例：15-3=?', generator: { type: 'addsub', ops: ['-'], max: 20 }, count: 25, timeSec: 90, difficulty: 1.2, gameMode: 'music', modeConfig: { melody: 'happy' } },
-  { id: 'addsub_20', category: '基础入门', name: '20以内的加减法', desc: '混合', generator: { type: 'addsub', ops: ['+', '-'], max: 20 }, count: 25, timeSec: 90, difficulty: 1.3, gameMode: 'racing' },
-  { id: 'fill_1_20', category: '基础入门', name: '20以内的填括号', desc: '例：10+？=13', generator: { type: 'fill', mode: 'within20' }, count: 20, timeSec: 90, difficulty: 1.3, gameMode: 'collection', modeConfig: { theme: 'fruit' } },
+  // ✨ 新格式示例：推荐多个模式，用户可自由选择
+  {
+    id: 'add_1_5',
+    category: '基础入门',
+    name: '5以内的加法',
+    desc: '例：2+3=?',
+    generator: { type: 'addsub', ops: ['+'], max: 5 },
+    count: 20,
+    timeSec: 300,
+    difficulty: 1.0,
+    recommendedModes: ['building', 'fishing', 'collection', 'racing'], // 推荐4个模式
+    defaultMode: 'building', // 默认使用建造模式
+    modeConfig: {
+      building: { buildingType: 'tower' }, // 建造模式专用配置
+      collection: { theme: 'fruit' }       // 收集模式专用配置
+    }
+  },
+  {
+    id: 'sub_1_5',
+    category: '基础入门',
+    name: '5以内的减法',
+    desc: '例：4-2=?',
+    generator: { type: 'addsub', ops: ['-'], max: 5 },
+    count: 20,
+    timeSec: 300,
+    difficulty: 1.0,
+    recommendedModes: ['fishing', 'collection', 'building', 'music'],
+    defaultMode: 'fishing'
+  },
+  {
+    id: 'addsub_1_5',
+    category: '基础入门',
+    name: '5以内的加减法',
+    desc: '加减混合',
+    generator: { type: 'addsub', ops: ['+', '-'], max: 5 },
+    count: 20,
+    timeSec: 300,
+    difficulty: 1.1,
+    recommendedModes: ['fishing', 'racing', 'building'],
+    defaultMode: 'fishing'
+  },
+  {
+    id: 'add_1_10',
+    category: '基础入门',
+    name: '10以内的加法',
+    desc: '例：6+3=?',
+    generator: { type: 'addsub', ops: ['+'], max: 10 },
+    count: 25,
+    timeSec: 300,
+    difficulty: 1.1,
+    recommendedModes: ['building', 'fishing', 'collection', 'battle'],
+    defaultMode: 'building',
+    modeConfig: {
+      building: { buildingType: 'tower' }
+    }
+  },
+  {
+    id: 'sub_1_10',
+    category: '基础入门',
+    name: '10以内的减法',
+    desc: '例：6-3=?',
+    generator: { type: 'addsub', ops: ['-'], max: 10 },
+    count: 25,
+    timeSec: 300,
+    difficulty: 1.1,
+    recommendedModes: ['fishing', 'building', 'collection'],
+    defaultMode: 'fishing'
+  },
+  {
+    id: 'addsub_1_10',
+    category: '基础入门',
+    name: '10以内的加减法',
+    desc: '加减混合',
+    generator: { type: 'addsub', ops: ['+', '-'], max: 10 },
+    count: 25,
+    timeSec: 300,
+    difficulty: 1.2,
+    recommendedModes: ['fishing', 'racing', 'building', 'battle'],
+    defaultMode: 'fishing'
+  },
+  {
+    id: 'fill_1_10',
+    category: '基础入门',
+    name: '10以内的填括号',
+    desc: '例：4-？=1',
+    generator: { type: 'fill', mode: 'within10' },
+    count: 20,
+    timeSec: 80,
+    difficulty: 1.2,
+    recommendedModes: ['puzzle', 'collection', 'fishing'],
+    defaultMode: 'collection',
+    modeConfig: {
+      collection: { theme: 'fruit' },
+      puzzle: { puzzleType: 'image' }
+    }
+  },
+  {
+    id: 'add_no_carry_20',
+    category: '基础入门',
+    name: '20以内不进位加法',
+    desc: '例：16+3=?',
+    generator: { type: 'noCarryAdd', max: 20 },
+    count: 25,
+    timeSec: 90,
+    difficulty: 1.2,
+    recommendedModes: ['fishing', 'building', 'racing'],
+    defaultMode: 'fishing'
+  },
+  {
+    id: 'sub_no_borrow_20',
+    category: '基础入门',
+    name: '20以内不退位减法',
+    desc: '例：16-3=?',
+    generator: { type: 'noBorrowSub', max: 20 },
+    count: 25,
+    timeSec: 90,
+    difficulty: 1.2,
+    recommendedModes: ['fishing', 'racing', 'building'],
+    defaultMode: 'fishing'
+  },
+  {
+    id: 'make10',
+    category: '基础入门',
+    name: '凑10练习',
+    desc: '例：？+8=10',
+    generator: { type: 'make10' },
+    count: 20,
+    timeSec: 60,
+    difficulty: 1.1,
+    recommendedModes: ['fishing', 'collection', 'puzzle'],
+    defaultMode: 'fishing'
+  },
+  {
+    id: 'add_carry_20',
+    category: '基础入门',
+    name: '20以内进位加法',
+    desc: '例：8+8=?',
+    generator: { type: 'carryAdd', max: 20 },
+    count: 25,
+    timeSec: 90,
+    difficulty: 1.3,
+    recommendedModes: ['cooking', 'battle', 'building'],
+    defaultMode: 'cooking'
+  },
+  {
+    id: 'sub_borrow_20',
+    category: '基础入门',
+    name: '20以内退位减法',
+    desc: '例：15-7=?',
+    generator: { type: 'borrowSub', max: 20 },
+    count: 25,
+    timeSec: 90,
+    difficulty: 1.3,
+    recommendedModes: ['cooking', 'battle', 'racing'],
+    defaultMode: 'cooking'
+  },
+  {
+    id: 'add_20',
+    category: '基础入门',
+    name: '20以内的加法',
+    desc: '例：15+3=?',
+    generator: { type: 'addsub', ops: ['+'], max: 20 },
+    count: 25,
+    timeSec: 90,
+    difficulty: 1.2,
+    recommendedModes: ['building', 'racing', 'fishing', 'battle'],
+    defaultMode: 'building',
+    modeConfig: {
+      building: { buildingType: 'tower' }
+    }
+  },
+  {
+    id: 'sub_20',
+    category: '基础入门',
+    name: '20以内的减法',
+    desc: '例：15-3=?',
+    generator: { type: 'addsub', ops: ['-'], max: 20 },
+    count: 25,
+    timeSec: 90,
+    difficulty: 1.2,
+    recommendedModes: ['music', 'racing', 'building', 'battle'],
+    defaultMode: 'music',
+    modeConfig: {
+      music: { melody: 'happy' }
+    }
+  },
+  {
+    id: 'addsub_20',
+    category: '基础入门',
+    name: '20以内的加减法',
+    desc: '混合',
+    generator: { type: 'addsub', ops: ['+', '-'], max: 20 },
+    count: 25,
+    timeSec: 90,
+    difficulty: 1.3,
+    recommendedModes: ['racing', 'battle', 'building', 'music'],
+    defaultMode: 'racing'
+  },
+  {
+    id: 'fill_1_20',
+    category: '基础入门',
+    name: '20以内的填括号',
+    desc: '例：10+？=13',
+    generator: { type: 'fill', mode: 'within20' },
+    count: 20,
+    timeSec: 90,
+    difficulty: 1.3,
+    recommendedModes: ['puzzle', 'collection', 'fishing'],
+    defaultMode: 'collection',
+    modeConfig: {
+      collection: { theme: 'fruit' },
+      puzzle: { puzzleType: 'chest' }
+    }
+  },
   { id: 'tens_plus_one', category: '基础入门', name: '整十数+一位数', desc: '例：50+3=?', generator: { type: 'tensOp', op: '+', mode: 'tens+one' }, count: 20, timeSec: 80, difficulty: 1.2 },
   { id: 'mix_1', category: '基础入门', name: '第一册计算综合', desc: '例：20-19+17', generator: { type: 'chain', terms: 3, max: 20 }, count: 25, timeSec: 120, difficulty: 1.4, gameMode: 'adventure' },
   { id: 'tens_minus_one', category: '基础入门', name: '整十数-一位数', desc: '例：80-5=?', generator: { type: 'tensOp', op: '-', mode: 'tens-one' }, count: 20, timeSec: 80, difficulty: 1.2 },
