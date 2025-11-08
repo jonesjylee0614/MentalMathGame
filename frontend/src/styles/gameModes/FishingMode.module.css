@@ -1,8 +1,8 @@
 /* 钓鱼场景容器 */
 .fishingScene {
   position: relative;
-  min-height: 500px;
-  padding: 1.5rem;
+  min-height: 280px;
+  padding: 1rem;
   background: linear-gradient(to bottom, 
     #87CEEB 0%, 
     #4FC3F7 30%, 
@@ -11,16 +11,18 @@
   );
   border-radius: 12px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  grid-template-rows: 1fr auto;
+  gap: 0.75rem;
 }
 
 /* 海洋区域 */
 .ocean {
   position: relative;
-  flex: 1;
-  min-height: 300px;
+  grid-column: 1;
+  grid-row: 1 / 3;
+  min-height: 250px;
   background: linear-gradient(to bottom, 
     rgba(100, 181, 246, 0.3) 0%,
     rgba(33, 150, 243, 0.5) 50%,
@@ -411,12 +413,23 @@
   }
 }
 
+/* 右侧面板容器 */
+.rightPanel {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
 /* 统计面板 */
 .statsPanel {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
-  padding: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  padding: 0.5rem;
   background: rgba(0, 0, 0, 0.4);
   border-radius: 8px;
   backdrop-filter: blur(10px);
@@ -426,8 +439,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.75rem;
+  gap: 0.15rem;
+  padding: 0.4rem;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   transition: all 0.3s ease;
@@ -445,29 +458,31 @@
 }
 
 .statLabel {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.8);
 }
 
 .statValue {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: bold;
   color: white;
 }
 
 /* 进度条 */
 .progressSection {
+  grid-column: 2;
+  grid-row: 2;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.3rem;
 }
 
 .progressBar {
   position: relative;
   width: 100%;
-  height: 30px;
+  height: 20px;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 15px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -475,16 +490,16 @@
   position: relative;
   height: 100%;
   background: linear-gradient(90deg, #4FC3F7, #0288D1, #01579B);
-  border-radius: 15px;
+  border-radius: 10px;
   transition: width 0.5s ease;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 5px;
+  padding-right: 3px;
 }
 
 .progressEmoji {
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   animation: progressSwim 1s ease-in-out infinite;
 }
 
@@ -495,16 +510,17 @@
 
 .progressLabel {
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: white;
   font-weight: 600;
 }
 
 /* 稀有度统计 */
 .rarityStats {
-  display: flex;
-  justify-content: space-around;
-  padding: 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  padding: 0.4rem;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 8px;
 }
@@ -512,18 +528,19 @@
 .rarityItem {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.3rem;
+  justify-content: center;
 }
 
 .rarityDot {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   box-shadow: 0 0 10px currentColor;
 }
 
 .rarityLabel {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: white;
   font-weight: 500;
 }
@@ -532,15 +549,15 @@
 .fishBasket {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: 0.5rem;
+  padding: 0.6rem;
   background: rgba(101, 67, 33, 0.6);
   border: 2px solid rgba(139, 69, 19, 0.8);
   border-radius: 8px;
 }
 
 .basketHeader {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: bold;
   color: white;
   text-align: center;
@@ -548,9 +565,9 @@
 
 .basketContent {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-  gap: 0.5rem;
-  max-height: 150px;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 0.4rem;
+  max-height: 100px;
   overflow-y: auto;
 }
 
@@ -558,8 +575,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem;
+  gap: 0.15rem;
+  padding: 0.3rem;
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid;
   border-radius: 8px;
@@ -583,11 +600,11 @@
 }
 
 .basketFishEmoji {
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 .basketFishScore {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: #4caf50;
   font-weight: bold;
 }
@@ -672,46 +689,71 @@
 /* 响应式设计 */
 @media (max-width: 768px) {
   .fishingScene {
-    min-height: 450px;
-    padding: 1rem;
+    min-height: 250px;
+    padding: 0.75rem;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
   }
 
   .ocean {
-    min-height: 250px;
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 150px;
+  }
+
+  .rightPanel {
+    grid-column: 1;
+    grid-row: 2;
+    max-height: none;
+  }
+
+  .progressSection {
+    grid-column: 1;
+    grid-row: 3;
   }
 
   .rodHandle {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .fishEmoji {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
 
   .statsPanel {
     grid-template-columns: repeat(2, 1fr);
+    padding: 0.4rem;
+    gap: 0.4rem;
+  }
+
+  .statBox {
+    padding: 0.3rem;
   }
 
   .statValue {
-    font-size: 1.2rem;
+    font-size: 0.95rem;
+  }
+
+  .statLabel {
+    font-size: 0.65rem;
   }
 
   .rarityStats {
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.3rem;
+    padding: 0.3rem;
   }
 
   .basketContent {
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-    max-height: 120px;
+    grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+    max-height: 80px;
   }
 
   .basketFishEmoji {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   .feedback {
-    font-size: 1rem;
-    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
   }
 }

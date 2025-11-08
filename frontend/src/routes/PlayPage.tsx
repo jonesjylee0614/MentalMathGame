@@ -2,7 +2,8 @@ import { CSSProperties, FormEvent, useCallback, useEffect, useMemo, useState } f
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { Game } from '../lib/engine';
-import { findLevel } from '../lib/levels';
+import { useLevel } from '../hooks/useLevel';
+import { useLevelsContext } from '../context/LevelsContext';
 import { formatTime } from '../lib/utils';
 import { useFeedbackSound } from '../lib/sound';
 import { GameResult, GameSnapshot, Question } from '../lib/types';
@@ -11,10 +12,54 @@ import { IGameMode, GameModeState } from '../lib/gameModes/IGameMode';
 import { EventBus } from '../lib/eventBus';
 import styles from '../styles/PlayPage.module.css';
 
+// 获取关卡在分类中的序号
+const getLevelNumber = (levelId: string, category: string, allLevels: any[]): number => {
+  const categoryLevels = allLevels.filter(l => l.category === category);
+  const index = categoryLevels.findIndex(item => item.id === levelId);
+  return index >= 0 ? index + 1 : 0;
+};
+
+// 游戏模式图标映射
+const getGameModeIcon = (mode: string): string => {
+  const icons: Record<string, string> = {
+    battle: '⚔️',
+    collection: '🎁',
+    fishing: '🎣',
+    building: '🏗️',
+    farming: '🌱',
+    music: '🎵',
+    puzzle: '🧩',
+    racing: '🏃',
+    cooking: '🍳',
+    adventure: '🗺️',
+    defense: '🛡️',
+  };
+  return icons[mode] || '🎮';
+};
+
+// 游戏模式名称映射
+const getGameModeName = (mode: string): string => {
+  const names: Record<string, string> = {
+    battle: '战斗',
+    collection: '收集',
+    fishing: '钓鱼',
+    building: '建造',
+    farming: '种植',
+    music: '音乐',
+    puzzle: '解密',
+    racing: '赛跑',
+    cooking: '烹饪',
+    adventure: '探险',
+    defense: '防守',
+  };
+  return names[mode] || mode;
+};
+
 export const PlayPage = () => {
   const { levelId } = useParams();
   const navigate = useNavigate();
-  const level = useMemo(() => (levelId ? findLevel(levelId) : null), [levelId]);
+  const { level, loading: levelLoading, error: levelError } = useLevel(levelId);
+  const { levels } = useLevelsContext();
   const { settings, recordResult, setLastResult } = useGame();
   const [state, setState] = useState<'idle' | 'preparing' | 'playing' | 'result'>('idle');
   const [snapshot, setSnapshot] = useState<GameSnapshot | null>(null);
@@ -27,6 +72,7 @@ export const PlayPage = () => {
   // 游戏模式状态
   const [gameMode, setGameMode] = useState<IGameMode | null>(null);
   const [modeState, setModeState] = useState<GameModeState | null>(null);
+  const [currentModeId, setCurrentModeId] = useState<string>('');
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorListOpen, setErrorListOpen] = useState(false);
@@ -56,10 +102,28 @@ export const PlayPage = () => {
   }, [answer, state, isSubmitting]);
 
   useEffect(() => {
-    if (!level) {
-      setError('未找到关卡，返回关卡列表');
+    // 等待level加载完成
+    if (levelLoading) {
       return;
     }
+    
+    // level未加载或加载失败
+    if (!level) {
+      setError(levelError || '未找到关卡，返回关卡列表');
+      return;
+    }
+
+    // 清除之前的错误
+    setError(null);
+    
+    // 调试：打印关卡配置
+    console.log('🎮 准备启动游戏，关卡配置:', {
+      id: level.id,
+      name: level.name,
+      generator: level.generator,
+      count: level.count,
+      timeSec: level.timeSec
+    });
 
     // 创建事件总线
     const eventBus = new EventBus();
@@ -69,8 +133,20 @@ export const PlayPage = () => {
       play: (sound: 'success' | 'error') => playSound(sound)
     };
 
-    // 创建游戏模式实例
-    const modeId = level.gameMode || 'battle';
+    // 创建游戏模式实例 - 从推荐模式中随机选择
+    let modeId: string;
+    if (level.recommendedModes && level.recommendedModes.length > 0) {
+      // 从推荐模式列表中随机选择一个
+      const randomIndex = Math.floor(Math.random() * level.recommendedModes.length);
+      modeId = level.recommendedModes[randomIndex];
+    } else {
+      // 如果没有推荐模式，使用默认模式或battle
+      modeId = level.gameMode || level.defaultMode || 'battle';
+    }
+    
+    // 保存当前使用的模式ID
+    setCurrentModeId(modeId);
+    
     const manager = GameModeManager.getInstance();
     
     const mode = manager.create(
@@ -194,14 +270,55 @@ export const PlayPage = () => {
       manager.deactivate();
       Game.reset();
     };
-  }, [level, navigate, playSound, recordResult, setLastResult, settings]);
+  }, [level, levelLoading, levelError, navigate, playSound, recordResult, setLastResult, settings]);
 
-  if (!level) {
+  // 所有hooks必须在条件return之前调用
+  const handleExit = useCallback(() => {
+    if (showExitConfirm) {
+      Game.reset();
+      navigate('/levels');
+    } else {
+      setShowExitConfirm(true);
+      setTimeout(() => setShowExitConfirm(false), 3000);
+    }
+  }, [showExitConfirm, navigate]);
+
+  const motivationalMessage = useMemo(() => {
+    if (!snapshot || !level) return '';
+    const totalQuestions = snapshot?.questionTotal ?? level.count;
+    const answeredQuestions = snapshot?.questionIndex ?? 0;
+    const remaining = totalQuestions - answeredQuestions;
+    const monsterHpPercent = snapshot?.hp.monster && snapshot?.hpMax.monster 
+      ? Math.max(0, Math.round((snapshot.hp.monster / snapshot.hpMax.monster) * 100))
+      : 0;
+    const playerHpPercent = snapshot?.hp.player && snapshot?.hpMax.player
+      ? Math.max(0, Math.round((snapshot.hp.player / snapshot.hpMax.player) * 100))
+      : 0;
+    
+    if (remaining === 0) return '最后冲刺！';
+    if (remaining <= 3) return `再对 ${remaining} 题就能获胜！`;
+    if (snapshot && snapshot.combo >= 3) return '完美连击！保持节奏！';
+    if (monsterHpPercent <= 30) return '怪兽快被打败了！';
+    if (playerHpPercent <= 30) return '小心！继续加油！';
+    return `还有 ${remaining} 题，继续战斗！`;
+  }, [snapshot, level]);
+
+  // 加载状态
+  if (levelLoading) {
     return (
       <div className="glass-card">
-        <p>{error}</p>
+        <p>⏳ 加载关卡中...</p>
+      </div>
+    );
+  }
+
+  // 错误状态或关卡不存在
+  if (!level || error || levelError) {
+    return (
+      <div className="glass-card">
+        <h3>❌ {error || levelError || '未找到关卡'}</h3>
         <button className="btn" onClick={() => navigate('/levels')}>
-          返回关卡列表
+          ⬅️ 返回关卡列表
         </button>
       </div>
     );
@@ -213,16 +330,6 @@ export const PlayPage = () => {
     if (!answer.trim() || state !== 'playing' || isSubmitting) return;
     handleSubmit();
   };
-
-  const handleExit = useCallback(() => {
-    if (showExitConfirm) {
-      Game.reset();
-      navigate('/levels');
-    } else {
-      setShowExitConfirm(true);
-      setTimeout(() => setShowExitConfirm(false), 3000);
-    }
-  }, [showExitConfirm, navigate]);
 
   const totalQuestions = snapshot?.questionTotal ?? level.count;
   const currentQuestion = snapshot ? snapshot.questionIndex + 1 : question ? 1 : 0;
@@ -269,15 +376,7 @@ export const PlayPage = () => {
     }
   ];
 
-  const motivationalMessage = useMemo(() => {
-    const remaining = totalQuestions - answeredQuestions;
-    if (remaining === 0) return '最后冲刺！';
-    if (remaining <= 3) return `再对 ${remaining} 题就能获胜！`;
-    if (snapshot && snapshot.combo >= 3) return '完美连击！保持节奏！';
-    if (monsterHpPercent <= 30) return '怪兽快被打败了！';
-    if (playerHpPercent <= 30) return '小心！继续加油！';
-    return `还有 ${remaining} 题，继续战斗！`;
-  }, [answeredQuestions, totalQuestions, snapshot, monsterHpPercent, playerHpPercent]);
+  // motivationalMessage已移至hooks顶部
 
   const wrongAnswers = snapshot?.history.filter(h => !h.correct) || [];
 
@@ -350,7 +449,15 @@ export const PlayPage = () => {
       {/* 顶部状态区：关卡名 + 进度 + 倒计时 */}
       <header className={`glass-card ${styles.topBar}`}>
         <div className={styles.levelInfo}>
-          <span className={styles.levelCategory}>🏁 {level.name}</span>
+          <div className={styles.levelTitleRow}>
+            <span className={styles.levelNumber}>第 {getLevelNumber(level.id, level.category, levels)} 关</span>
+            <span className={styles.levelCategory}>🏁 {level.name}</span>
+            {currentModeId && (
+              <span className={styles.gameModeBadge}>
+                {getGameModeIcon(currentModeId)} {getGameModeName(currentModeId)}模式
+              </span>
+            )}
+          </div>
           <div className={styles.levelProgress}>
             <span>第 {currentQuestion || 1}/{totalQuestions} 题</span>
             <div className={styles.progressTrack}>

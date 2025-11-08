@@ -2,6 +2,7 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { PrivateRoute } from './components/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { LevelsProvider } from './context/LevelsContext';
 import { HomePage } from './routes/HomePage';
 import { LoginPage } from './routes/LoginPage';
 import { RegisterPage } from './routes/RegisterPage';
@@ -18,7 +19,8 @@ import { LogViewerPage } from './routes/LogViewerPage';
 const App = () => {
   return (
     <ErrorBoundary>
-      <Routes>
+      <LevelsProvider>
+        <Routes>
         {/* 公开路由 */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -83,7 +85,8 @@ const App = () => {
         </Route>
         
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+        </Routes>
+      </LevelsProvider>
     </ErrorBoundary>
   );
 };

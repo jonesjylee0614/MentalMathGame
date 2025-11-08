@@ -44,12 +44,14 @@ type PreviousBestInfo struct {
 }
 
 type RewardsInfo struct {
-	ExpGained    int  `json:"exp_gained"`
-	ScoreGained  int  `json:"score_gained"`
-	LevelUp      bool `json:"level_up"`
-	NewLevel     int  `json:"new_level"`
-	NewExp       int  `json:"new_exp"`
-	NextLevelExp int  `json:"next_level_exp"`
+	ExpGained      int  `json:"exp_gained"`
+	ScoreGained    int  `json:"score_gained"`
+	PointsGained   int  `json:"points_gained"`     // 奖励积分
+	IsFullReward   bool `json:"is_full_reward"`    // 是否获得全额奖励（全对+在目标时间内）
+	LevelUp        bool `json:"level_up"`
+	NewLevel       int  `json:"new_level"`
+	NewExp         int  `json:"new_exp"`
+	NextLevelExp   int  `json:"next_level_exp"`
 }
 
 type AchievementInfo struct {

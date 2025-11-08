@@ -37,7 +37,9 @@ export interface Level {
   generator: Record<string, unknown>;
   count: number;
   timeSec: number;
+  targetTime?: number;           // 目标完成时间（秒）
   difficulty: number;
+  rewardPoints?: number;         // 完成奖励积分
   hp?: {
     player?: number;
     monster?: number;

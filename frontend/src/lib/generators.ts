@@ -55,8 +55,9 @@ const chainResult = (numbers: number[], ops: string[]) => {
 };
 
 const makeAddSub = (max: number, ops: string[]) => {
-  const a = randInt(0, max);
-  const b = randInt(0, max);
+  // 避免生成与0的运算，从1开始
+  const a = randInt(1, max);
+  const b = randInt(1, max);
   const op = sample(ops);
   let left = a;
   let right = b;
@@ -71,8 +72,9 @@ const makeFill = (mode: string) => {
   const max = mode === 'within10' ? 10 : mode === 'within20' ? 20 : 100;
   const op = sample(['+', '-']);
   const blankPos = sample(['left', 'right', 'result']);
-  let a = randInt(0, max);
-  let b = randInt(0, max);
+  // 避免生成与0的运算
+  let a = randInt(1, max);
+  let b = randInt(1, max);
   if (op === '-' && a < b) [a, b] = [b, a];
   let text: string;
   let answer: number;
@@ -105,8 +107,9 @@ const makeNoCarryAdd = (max: number) => {
   let a: number;
   let b: number;
   do {
-    a = randInt(0, max);
-    b = randInt(0, max);
+    // 避免生成与0的运算
+    a = randInt(1, max);
+    b = randInt(1, max);
   } while ((a % 10) + (b % 10) >= 10);
   return toQuestion(`${a} + ${b} = ?`, a + b);
 };
@@ -115,8 +118,9 @@ const makeNoBorrowSub = (max: number) => {
   let a: number;
   let b: number;
   do {
-    a = randInt(0, max);
-    b = randInt(0, max);
+    // 避免生成与0的运算
+    a = randInt(1, max);
+    b = randInt(1, max);
     if (a < b) [a, b] = [b, a];
   } while ((a % 10) < (b % 10));
   return toQuestion(`${a} - ${b} = ?`, a - b);
@@ -126,8 +130,9 @@ const makeCarryAdd = (max: number) => {
   let a: number;
   let b: number;
   do {
-    a = randInt(0, max);
-    b = randInt(0, max);
+    // 避免生成与0的运算
+    a = randInt(1, max);
+    b = randInt(1, max);
   } while ((a % 10) + (b % 10) < 10);
   return toQuestion(`${a} + ${b} = ?`, a + b);
 };
@@ -137,7 +142,8 @@ const makeBorrowSub = (max: number) => {
   let b: number;
   do {
     a = randInt(Math.ceil(max / 2), max);
-    b = randInt(0, max);
+    // 避免生成与0的运算
+    b = randInt(1, max);
     if (a < b) [a, b] = [b, a];
   } while ((a % 10) >= (b % 10));
   return toQuestion(`${a} - ${b} = ?`, a - b);
@@ -169,7 +175,8 @@ const makeTensOp = ({ op, mode }: { op: string; mode: string }) => {
 const makeChain = ({ terms, max }: { terms: number | string; max: number }) => {
   const range = typeof terms === 'number' ? { min: terms, max: terms } : parseRange(String(terms), 3);
   const termCount = randInt(range.min, range.max);
-  const numbers = Array.from({ length: termCount }, () => randInt(0, max));
+  // 避免生成与0的运算
+  const numbers = Array.from({ length: termCount }, () => randInt(1, max));
   const ops = chooseChainOps(termCount, ['+', '-']);
   if (!nonNegativeResult(numbers, ops)) {
     return makeChain({ terms, max });
@@ -179,14 +186,16 @@ const makeChain = ({ terms, max }: { terms: number | string; max: number }) => {
 };
 
 const makeChain3 = ({ max, ops }: { max: number; ops: string | string[] }) => {
-  const numbers = Array.from({ length: 3 }, () => randInt(0, max));
+  // 避免生成与0的运算
+  const numbers = Array.from({ length: 3 }, () => randInt(1, max));
   const chosen = chooseChainOps(3, ops);
   const { value, text } = chainResult(numbers, chosen);
   return toQuestion(text, value);
 };
 
 const makeAddsubChain = ({ terms, max }: { terms: number; max: number }) => {
-  const numbers = Array.from({ length: terms }, () => randInt(0, max));
+  // 避免生成与0的运算
+  const numbers = Array.from({ length: terms }, () => randInt(1, max));
   const ops = chooseChainOps(terms, ['+', '-']);
   if (!nonNegativeResult(numbers, ops)) {
     return makeAddsubChain({ terms, max });

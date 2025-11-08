@@ -169,34 +169,83 @@ export const FishingModeComponent: React.FC<GameModeRenderProps> = ({
         )}
       </div>
 
-      {/* 钓鱼统计面板 */}
-      <div className={styles.statsPanel}>
-        {/* 总分 */}
-        <div className={styles.statBox}>
-          <div className={styles.statLabel}>总分</div>
-          <div className={styles.statValue}>{totalScore}</div>
-        </div>
+      {/* 右侧面板 */}
+      <div className={styles.rightPanel}>
+        {/* 钓鱼统计面板 */}
+        <div className={styles.statsPanel}>
+          {/* 总分 */}
+          <div className={styles.statBox}>
+            <div className={styles.statLabel}>总分</div>
+            <div className={styles.statValue}>{totalScore}</div>
+          </div>
 
-        {/* 已钓数量 */}
-        <div className={styles.statBox}>
-          <div className={styles.statLabel}>已钓</div>
-          <div className={styles.statValue}>
-            {caughtFish?.length || 0}/{totalQuestions}
+          {/* 已钓数量 */}
+          <div className={styles.statBox}>
+            <div className={styles.statLabel}>已钓</div>
+            <div className={styles.statValue}>
+              {caughtFish?.length || 0}/{totalQuestions}
+            </div>
+          </div>
+
+          {/* 连击 */}
+          <div className={`${styles.statBox} ${combo > 0 ? styles.comboActive : ''}`}>
+            <div className={styles.statLabel}>连击</div>
+            <div className={styles.statValue}>
+              {combo > 0 ? `🔥 ${combo}` : '0'}
+            </div>
+          </div>
+
+          {/* 最佳连击 */}
+          <div className={styles.statBox}>
+            <div className={styles.statLabel}>最佳</div>
+            <div className={styles.statValue}>⭐ {bestCombo}</div>
           </div>
         </div>
 
-        {/* 连击 */}
-        <div className={`${styles.statBox} ${combo > 0 ? styles.comboActive : ''}`}>
-          <div className={styles.statLabel}>连击</div>
-          <div className={styles.statValue}>
-            {combo > 0 ? `🔥 ${combo}` : '0'}
+        {/* 稀有度统计 */}
+        <div className={styles.rarityStats}>
+          <div className={styles.rarityItem}>
+            <span className={styles.rarityDot} style={{ background: getRarityColor('common') }} />
+            <span className={styles.rarityLabel}>普通: {rarityStats.common}</span>
+          </div>
+          <div className={styles.rarityItem}>
+            <span className={styles.rarityDot} style={{ background: getRarityColor('rare') }} />
+            <span className={styles.rarityLabel}>稀有: {rarityStats.rare}</span>
+          </div>
+          <div className={styles.rarityItem}>
+            <span className={styles.rarityDot} style={{ background: getRarityColor('epic') }} />
+            <span className={styles.rarityLabel}>史诗: {rarityStats.epic}</span>
+          </div>
+          <div className={styles.rarityItem}>
+            <span className={styles.rarityDot} style={{ background: getRarityColor('legendary') }} />
+            <span className={styles.rarityLabel}>传说: {rarityStats.legendary}</span>
           </div>
         </div>
 
-        {/* 最佳连击 */}
-        <div className={styles.statBox}>
-          <div className={styles.statLabel}>最佳</div>
-          <div className={styles.statValue}>⭐ {bestCombo}</div>
+        {/* 鱼篓（已钓到的鱼） */}
+        <div className={styles.fishBasket}>
+          <div className={styles.basketHeader}>
+            🧺 鱼篓 ({caughtFish?.length || 0})
+          </div>
+          <div className={styles.basketContent}>
+            {caughtFish && caughtFish.length > 0 ? (
+              caughtFish.slice(-8).reverse().map((fish: Fish) => (
+                <div 
+                  key={fish.id} 
+                  className={styles.basketFish}
+                  style={{ 
+                    borderColor: getRarityColor(fish.rarity),
+                    boxShadow: `0 0 10px ${getRarityColor(fish.rarity)}40`
+                  }}
+                >
+                  <span className={styles.basketFishEmoji}>{fish.emoji}</span>
+                  <span className={styles.basketFishScore}>+{fish.score}</span>
+                </div>
+              ))
+            ) : (
+              <div className={styles.emptyBasket}>还没有钓到鱼...</div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -215,52 +264,6 @@ export const FishingModeComponent: React.FC<GameModeRenderProps> = ({
         </div>
       </div>
 
-      {/* 稀有度统计 */}
-      <div className={styles.rarityStats}>
-        <div className={styles.rarityItem}>
-          <span className={styles.rarityDot} style={{ background: getRarityColor('common') }} />
-          <span className={styles.rarityLabel}>普通: {rarityStats.common}</span>
-        </div>
-        <div className={styles.rarityItem}>
-          <span className={styles.rarityDot} style={{ background: getRarityColor('rare') }} />
-          <span className={styles.rarityLabel}>稀有: {rarityStats.rare}</span>
-        </div>
-        <div className={styles.rarityItem}>
-          <span className={styles.rarityDot} style={{ background: getRarityColor('epic') }} />
-          <span className={styles.rarityLabel}>史诗: {rarityStats.epic}</span>
-        </div>
-        <div className={styles.rarityItem}>
-          <span className={styles.rarityDot} style={{ background: getRarityColor('legendary') }} />
-          <span className={styles.rarityLabel}>传说: {rarityStats.legendary}</span>
-        </div>
-      </div>
-
-      {/* 鱼篓（已钓到的鱼） */}
-      <div className={styles.fishBasket}>
-        <div className={styles.basketHeader}>
-          🧺 鱼篓 ({caughtFish?.length || 0})
-        </div>
-        <div className={styles.basketContent}>
-          {caughtFish && caughtFish.length > 0 ? (
-            caughtFish.slice(-8).reverse().map((fish: Fish) => (
-              <div 
-                key={fish.id} 
-                className={styles.basketFish}
-                style={{ 
-                  borderColor: getRarityColor(fish.rarity),
-                  boxShadow: `0 0 10px ${getRarityColor(fish.rarity)}40`
-                }}
-              >
-                <span className={styles.basketFishEmoji}>{fish.emoji}</span>
-                <span className={styles.basketFishScore}>+{fish.score}</span>
-              </div>
-            ))
-          ) : (
-            <div className={styles.emptyBasket}>还没有钓到鱼...</div>
-          )}
-        </div>
-      </div>
-
       {/* 反馈消息 */}
       {feedback && encouragingMsg && (
         <div className={`${styles.feedback} ${
@@ -272,10 +275,10 @@ export const FishingModeComponent: React.FC<GameModeRenderProps> = ({
       )}
 
       {/* 提示信息 */}
-      <div className={styles.hints}>
+      {/* <div className={styles.hints}>
         <div className={styles.hint}>💡 答对钓鱼，答错跑鱼</div>
         <div className={styles.hint}>🔥 连击增加稀有鱼概率和分数加成</div>
-      </div>
+      </div> */}
     </section>
   );
 };

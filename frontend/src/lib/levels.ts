@@ -1,5 +1,9 @@
 import { Level } from './types';
 
+// 缓存的关卡数据（从API获取后存储）
+let cachedLevels: Level[] | null = null;
+
+// 保留LEVELS数组作为fallback（离线使用或开发环境）
 export const LEVELS: Level[] = [
   // 基础入门：5 内与 10 内
   // ✨ 新格式示例：推荐多个模式，用户可自由选择
@@ -11,7 +15,9 @@ export const LEVELS: Level[] = [
     generator: { type: 'addsub', ops: ['+'], max: 5 },
     count: 20,
     timeSec: 300,
+    targetTime: 240,  // 目标时间：300 * 0.8 = 240秒
     difficulty: 1.0,
+    rewardPoints: 10, // 奖励积分
     recommendedModes: ['building', 'fishing', 'collection', 'racing'], // 推荐4个模式
     defaultMode: 'building', // 默认使用建造模式
     modeConfig: {
@@ -128,8 +134,8 @@ export const LEVELS: Level[] = [
     name: '凑10练习',
     desc: '例：？+8=10',
     generator: { type: 'make10' },
-    count: 20,
-    timeSec: 60,
+    count: 10,
+    timeSec: 40,
     difficulty: 1.1,
     recommendedModes: ['fishing', 'collection', 'puzzle'],
     defaultMode: 'fishing'
@@ -276,11 +282,35 @@ export const LEVELS: Level[] = [
   { id: 'paren_mix', category: '挑战进阶', name: '含小括号的混合运算', desc: '(79-76)×8', generator: { type: 'parenMix' }, count: 20, timeSec: 150, difficulty: 2.3, gameMode: 'puzzle', modeConfig: { puzzleType: 'lock' } }
 ];
 
-export const findLevel = (levelId: string) => LEVELS.find((level) => level.id === levelId) ?? null;
+/**
+ * 设置缓存的关卡数据（由LevelsContext调用）
+ */
+export const setLevels = (levels: Level[]) => {
+  cachedLevels = levels;
+};
 
+/**
+ * 获取关卡数据（优先使用缓存，否则使用fallback）
+ */
+const getLevels = (): Level[] => {
+  return cachedLevels || LEVELS;
+};
+
+/**
+ * 根据ID查找关卡
+ */
+export const findLevel = (levelId: string): Level | null => {
+  const levels = getLevels();
+  return levels.find((level) => level.id === levelId) ?? null;
+};
+
+/**
+ * 获取所有关卡分类
+ */
 export const listCategories = () => {
+  const levels = getLevels();
   const map = new Map<string, Level[]>();
-  LEVELS.forEach((level) => {
+  levels.forEach((level) => {
     if (!map.has(level.category)) map.set(level.category, []);
     map.get(level.category)!.push(level);
   });

@@ -139,7 +139,9 @@ func (s *gameService) SubmitGameResult(userID uint64, req *dto.SubmitGameRequest
 		
 		// 计算经验值和积分奖励
 		expGained := s.calculateExp(req, level)
-		scoreGained := req.Score
+		
+		// 计算积分奖励：只有全对且在目标时间内完成才奖励
+		scoreGained := s.calculateRewardPoints(req, level)
 		
 		stats.TotalScore += scoreGained
 		stats.TotalPlays++
@@ -177,9 +179,20 @@ func (s *gameService) SubmitGameResult(userID uint64, req *dto.SubmitGameRequest
 		// 计算下一级所需经验
 		nextLevelExp := s.getExpForLevel(newLevel + 1)
 		
+		// 判断是否获得全额奖励
+		targetTime := level.TargetTime
+		if targetTime == 0 {
+			targetTime = level.TimeLimit
+		}
+		isFullReward := scoreGained > 0 && 
+			req.CorrectCount == req.TotalQuestions && 
+			req.TimeUsed <= targetTime
+		
 		response.Rewards = dto.RewardsInfo{
 			ExpGained:    expGained,
-			ScoreGained:  scoreGained,
+			ScoreGained:  req.Score,           // 游戏得分
+			PointsGained: scoreGained,         // 奖励积分
+			IsFullReward: isFullReward,
 			LevelUp:      newLevel > oldLevel,
 			NewLevel:     newLevel,
 			NewExp:       newExp,
@@ -320,6 +333,29 @@ func (s *gameService) calculateExp(req *dto.SubmitGameRequest, level *model.Leve
 	}
 	
 	return totalExp
+}
+
+// 计算积分奖励：只有全对且在目标时间内完成才奖励
+func (s *gameService) calculateRewardPoints(req *dto.SubmitGameRequest, level *model.Level) int {
+	// 条件1：必须全对
+	if req.CorrectCount != req.TotalQuestions {
+		return 0
+	}
+	
+	// 条件2：必须在目标时间内完成
+	targetTime := level.TargetTime
+	if targetTime == 0 {
+		// 如果没有设置目标时间，使用时间上限
+		targetTime = level.TimeLimit
+	}
+	
+	// 检查是否在目标时间内完成
+	if req.TimeUsed > targetTime {
+		return 0
+	}
+	
+	// 满足条件，返回奖励积分
+	return level.RewardPoints
 }
 
 // 计算等级

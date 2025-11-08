@@ -63,7 +63,9 @@ type Level struct {
 	GeneratorConfig  JSONMap         `gorm:"type:json;not null" json:"generator_config"`
 	QuestionCount    int             `gorm:"default:20" json:"question_count"`
 	TimeLimit        int             `gorm:"default:120" json:"time_limit"`
+	TargetTime       int             `gorm:"default:0" json:"target_time"`        // 目标完成时间（秒），0表示使用time_limit
 	Difficulty       float64         `gorm:"type:decimal(3,2);default:1.00" json:"difficulty"`
+	RewardPoints     int             `gorm:"default:0" json:"reward_points"`      // 完成奖励积分
 	HPConfig         JSONMap         `gorm:"type:json" json:"hp_config"`
 	GameMode         string          `gorm:"type:varchar(50);default:'battle'" json:"game_mode"`
 	RecommendedModes JSONStringArray `gorm:"type:json" json:"recommended_modes"`
