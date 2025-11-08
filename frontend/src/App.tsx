@@ -13,6 +13,7 @@ import { PlayPage } from './routes/PlayPage';
 import { StatsPage } from './routes/StatsPage';
 import { SettingsPage } from './routes/SettingsPage';
 import { ResultPage } from './routes/ResultPage';
+import { LogViewerPage } from './routes/LogViewerPage';
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         {/* 公开路由 */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/logs" element={<LogViewerPage />} />
         
         {/* 需要布局的路由 */}
         <Route element={<Layout />}>

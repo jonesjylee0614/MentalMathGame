@@ -28,7 +28,7 @@ func (h *UserHandler) GetMe(c *gin.Context) {
 	
 	user, err := h.userService.GetUserByID(userID)
 	if err != nil {
-		response.InternalError(c, "获取用户信息失败")
+		response.InternalServerError(c, "获取用户信息失败")
 		return
 	}
 	
@@ -51,7 +51,7 @@ func (h *UserHandler) UpdateMe(c *gin.Context) {
 	
 	user, err := h.userService.UpdateUser(userID, &req)
 	if err != nil {
-		response.InternalError(c, "更新用户信息失败")
+		response.InternalServerError(c, "更新用户信息失败")
 		return
 	}
 	
@@ -87,7 +87,7 @@ func (h *UserHandler) GetSettings(c *gin.Context) {
 	
 	settings, err := h.userService.GetUserSettings(userID)
 	if err != nil {
-		response.InternalError(c, "获取用户设置失败")
+		response.InternalServerError(c, "获取用户设置失败")
 		return
 	}
 	
@@ -110,7 +110,7 @@ func (h *UserHandler) UpdateSettings(c *gin.Context) {
 	
 	settings, err := h.userService.UpdateUserSettings(userID, &req)
 	if err != nil {
-		response.InternalError(c, "更新用户设置失败")
+		response.InternalServerError(c, "更新用户设置失败")
 		return
 	}
 	
@@ -155,7 +155,7 @@ func (h *UserHandler) Migrate(c *gin.Context) {
 	
 	result, err := h.userService.MigrateData(userID, &req)
 	if err != nil {
-		response.InternalError(c, "数据迁移失败: "+err.Error())
+		response.InternalServerError(c, "数据迁移失败: "+err.Error())
 		return
 	}
 	

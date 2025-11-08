@@ -29,7 +29,7 @@ func (h *StatsHandler) GetMyStats(c *gin.Context) {
 	
 	stats, err := h.statsService.GetUserStats(userID)
 	if err != nil {
-		response.InternalError(c, "获取统计数据失败")
+		response.InternalServerError(c, "获取统计数据失败")
 		return
 	}
 	
@@ -48,7 +48,7 @@ func (h *StatsHandler) GetMyProgress(c *gin.Context) {
 	
 	progress, err := h.statsService.GetUserProgress(userID, category)
 	if err != nil {
-		response.InternalError(c, "获取进度数据失败")
+		response.InternalServerError(c, "获取进度数据失败")
 		return
 	}
 	
@@ -91,7 +91,7 @@ func (h *StatsHandler) GetMyAchievements(c *gin.Context) {
 	
 	achievements, err := h.statsService.GetUserAchievements(userID, completed)
 	if err != nil {
-		response.InternalError(c, "获取成就数据失败")
+		response.InternalServerError(c, "获取成就数据失败")
 		return
 	}
 	

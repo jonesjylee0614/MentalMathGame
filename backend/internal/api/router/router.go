@@ -2,7 +2,6 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/yourusername/MentalMathGame/internal/api/handler"
 	"github.com/yourusername/MentalMathGame/internal/api/middleware"
 	"github.com/yourusername/MentalMathGame/internal/config"
 	"gorm.io/gorm"

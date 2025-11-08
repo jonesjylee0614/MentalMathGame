@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// JSONMap 用于存储 JSON 类型
+// JSONMap 用于存储 JSON 对象
 type JSONMap map[string]interface{}
 
 // Scan 实现 Scanner 接口
@@ -30,21 +30,48 @@ func (j JSONMap) Value() (driver.Value, error) {
 	return json.Marshal(j)
 }
 
+// JSONStringArray 用于存储 JSON 字符串数组
+type JSONStringArray []string
+
+// Scan 实现 Scanner 接口
+func (j *JSONStringArray) Scan(value interface{}) error {
+	if value == nil {
+		*j = nil
+		return nil
+	}
+	bytes, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+	return json.Unmarshal(bytes, j)
+}
+
+// Value 实现 Valuer 接口
+func (j JSONStringArray) Value() (driver.Value, error) {
+	if j == nil {
+		return nil, nil
+	}
+	return json.Marshal(j)
+}
+
 // Level 关卡配置模型
 type Level struct {
-	ID              string    `gorm:"primaryKey;type:varchar(50)" json:"id"`
-	Category        string    `gorm:"type:varchar(50);index;not null" json:"category"`
-	Name            string    `gorm:"type:varchar(100);not null" json:"name"`
-	Description     string    `gorm:"type:text" json:"description"`
-	GeneratorConfig JSONMap   `gorm:"type:json;not null" json:"generator_config"`
-	QuestionCount   int       `gorm:"default:20" json:"question_count"`
-	TimeLimit       int       `gorm:"default:120" json:"time_limit"`
-	Difficulty      float64   `gorm:"type:decimal(3,2);default:1.00" json:"difficulty"`
-	HPConfig        JSONMap   `gorm:"type:json" json:"hp_config"`
-	Status          int8      `gorm:"default:1;index" json:"status"` // 0-禁用 1-正常
-	SortOrder       int       `gorm:"default:0;index" json:"sort_order"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	ID               string          `gorm:"primaryKey;type:varchar(50)" json:"id"`
+	Category         string          `gorm:"type:varchar(50);index;not null" json:"category"`
+	Name             string          `gorm:"type:varchar(100);not null" json:"name"`
+	Description      string          `gorm:"type:text" json:"description"`
+	GeneratorConfig  JSONMap         `gorm:"type:json;not null" json:"generator_config"`
+	QuestionCount    int             `gorm:"default:20" json:"question_count"`
+	TimeLimit        int             `gorm:"default:120" json:"time_limit"`
+	Difficulty       float64         `gorm:"type:decimal(3,2);default:1.00" json:"difficulty"`
+	HPConfig         JSONMap         `gorm:"type:json" json:"hp_config"`
+	GameMode         string          `gorm:"type:varchar(50);default:'battle'" json:"game_mode"`
+	RecommendedModes JSONStringArray `gorm:"type:json" json:"recommended_modes"`
+	ModeConfig       JSONMap         `gorm:"type:json" json:"mode_config"`
+	Status           int8            `gorm:"default:1;index" json:"status"` // 0-禁用 1-正常
+	SortOrder        int             `gorm:"default:0;index" json:"sort_order"`
+	CreatedAt        time.Time       `json:"created_at"`
+	UpdatedAt        time.Time       `json:"updated_at"`
 }
 
 // TableName 指定表名

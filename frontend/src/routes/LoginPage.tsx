@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { persistentLogger } from '../lib/persistentLogger';
 import styles from '../styles/LoginPage.module.css';
 
 export const LoginPage = () => {
@@ -13,16 +14,30 @@ export const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    persistentLogger.info('=== 登录表单提交 ===', { username });
+    
     setError('');
     setLoading(true);
 
     try {
+      persistentLogger.info('调用login函数', { username });
       await login({ username, password });
+      persistentLogger.info('login函数执行成功，准备跳转');
+      
+      persistentLogger.info('开始导航到首页');
       navigate('/');
+      persistentLogger.info('navigate函数已调用');
     } catch (err: any) {
+      persistentLogger.error('登录过程中捕获错误', { 
+        error: err.message || err,
+        errorType: err.constructor?.name 
+      });
       setError(err.message || '登录失败');
     } finally {
       setLoading(false);
+      persistentLogger.info('登录流程结束（finally块）', { 
+        hasError: !!error 
+      });
     }
   };
 

@@ -22,7 +22,17 @@ func main() {
 	}
 	
 	// 2. 初始化日志
-	logger.InitLogger()
+	logConfig := config.AppConfig.Log
+	if err := logger.InitLogger(
+		logConfig.Level,
+		logConfig.Filename,
+		logConfig.MaxSize,
+		logConfig.MaxAge,
+		logConfig.MaxBackups,
+		logConfig.Compress,
+	); err != nil {
+		log.Fatalf("Failed to initialize logger: %v", err)
+	}
 	defer logger.Sync()
 	
 	logger.Info("Starting Mental Math Game Server...")

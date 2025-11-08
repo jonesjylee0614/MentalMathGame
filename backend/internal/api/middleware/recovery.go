@@ -20,7 +20,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 					zap.String("method", c.Request.Method),
 				)
 				
-				response.Error(c, http.StatusInternalServerError, "服务器内部错误", nil)
+				response.Error(c, http.StatusInternalServerError, "服务器内部错误")
 				c.Abort()
 			}
 		}()

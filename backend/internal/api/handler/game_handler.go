@@ -36,7 +36,7 @@ func (h *GameHandler) SubmitResult(c *gin.Context) {
 	
 	result, err := h.gameService.SubmitGameResult(userID, &req)
 	if err != nil {
-		response.InternalError(c, "提交游戏结果失败: "+err.Error())
+		response.InternalServerError(c, "提交游戏结果失败: "+err.Error())
 		return
 	}
 	
@@ -58,7 +58,7 @@ func (h *GameHandler) GetRecords(c *gin.Context) {
 	
 	result, err := h.gameService.GetGameRecords(userID, levelID, outcome, page, pageSize)
 	if err != nil {
-		response.InternalError(c, "获取游戏记录失败")
+		response.InternalServerError(c, "获取游戏记录失败")
 		return
 	}
 	

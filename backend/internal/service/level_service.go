@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"errors"
 	"time"
 	
@@ -38,26 +37,33 @@ func (s *levelService) GetLevels(category string, status int) ([]dto.LevelRespon
 	
 	result := make([]dto.LevelResponse, len(levels))
 	for i, l := range levels {
-		var generatorConfig map[string]interface{}
-		json.Unmarshal(l.GeneratorConfig, &generatorConfig)
+		generatorConfig := map[string]interface{}(l.GeneratorConfig)
 		
 		var hpConfig map[string]interface{}
 		if l.HPConfig != nil {
-			json.Unmarshal(l.HPConfig, &hpConfig)
+			hpConfig = map[string]interface{}(l.HPConfig)
+		}
+		
+		var modeConfig map[string]interface{}
+		if l.ModeConfig != nil {
+			modeConfig = map[string]interface{}(l.ModeConfig)
 		}
 		
 		result[i] = dto.LevelResponse{
-			ID:              l.ID,
-			Category:        l.Category,
-			Name:            l.Name,
-			Description:     l.Description,
-			GeneratorConfig: generatorConfig,
-			QuestionCount:   l.QuestionCount,
-			TimeLimit:       l.TimeLimit,
-			Difficulty:      l.Difficulty,
-			HPConfig:        hpConfig,
-			Status:          l.Status,
-			SortOrder:       l.SortOrder,
+			ID:               l.ID,
+			Category:         l.Category,
+			Name:             l.Name,
+			Description:      l.Description,
+			GeneratorConfig:  generatorConfig,
+			QuestionCount:    l.QuestionCount,
+			TimeLimit:        l.TimeLimit,
+			Difficulty:       l.Difficulty,
+			HPConfig:         hpConfig,
+			GameMode:         l.GameMode,
+			RecommendedModes: []string(l.RecommendedModes),
+			ModeConfig:       modeConfig,
+			Status:           int(l.Status),
+			SortOrder:        l.SortOrder,
 		}
 	}
 	
@@ -70,27 +76,34 @@ func (s *levelService) GetLevelDetail(levelID string, userID uint64) (*dto.Level
 		return nil, errors.New("关卡未找到")
 	}
 	
-	var generatorConfig map[string]interface{}
-	json.Unmarshal(level.GeneratorConfig, &generatorConfig)
+	generatorConfig := map[string]interface{}(level.GeneratorConfig)
 	
 	var hpConfig map[string]interface{}
 	if level.HPConfig != nil {
-		json.Unmarshal(level.HPConfig, &hpConfig)
+		hpConfig = map[string]interface{}(level.HPConfig)
+	}
+	
+	var modeConfig map[string]interface{}
+	if level.ModeConfig != nil {
+		modeConfig = map[string]interface{}(level.ModeConfig)
 	}
 	
 	response := &dto.LevelDetailResponse{
 		LevelResponse: dto.LevelResponse{
-			ID:              level.ID,
-			Category:        level.Category,
-			Name:            level.Name,
-			Description:     level.Description,
-			GeneratorConfig: generatorConfig,
-			QuestionCount:   level.QuestionCount,
-			TimeLimit:       level.TimeLimit,
-			Difficulty:      level.Difficulty,
-			HPConfig:        hpConfig,
-			Status:          level.Status,
-			SortOrder:       level.SortOrder,
+			ID:               level.ID,
+			Category:         level.Category,
+			Name:             level.Name,
+			Description:      level.Description,
+			GeneratorConfig:  generatorConfig,
+			QuestionCount:    level.QuestionCount,
+			TimeLimit:        level.TimeLimit,
+			Difficulty:       level.Difficulty,
+			HPConfig:         hpConfig,
+			GameMode:         level.GameMode,
+			RecommendedModes: []string(level.RecommendedModes),
+			ModeConfig:       modeConfig,
+			Status:           int(level.Status),
+			SortOrder:        level.SortOrder,
 		},
 	}
 	

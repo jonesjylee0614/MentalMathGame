@@ -2,17 +2,20 @@ package dto
 
 // LevelResponse 关卡响应
 type LevelResponse struct {
-	ID              string                 `json:"id"`
-	Category        string                 `json:"category"`
-	Name            string                 `json:"name"`
-	Description     string                 `json:"description"`
-	GeneratorConfig map[string]interface{} `json:"generator_config"`
-	QuestionCount   int                    `json:"question_count"`
-	TimeLimit       int                    `json:"time_limit"`
-	Difficulty      float64                `json:"difficulty"`
-	HPConfig        map[string]interface{} `json:"hp_config,omitempty"`
-	Status          int                    `json:"status"`
-	SortOrder       int                    `json:"sort_order"`
+	ID               string                 `json:"id"`
+	Category         string                 `json:"category"`
+	Name             string                 `json:"name"`
+	Description      string                 `json:"description"`
+	GeneratorConfig  map[string]interface{} `json:"generator_config"`
+	QuestionCount    int                    `json:"question_count"`
+	TimeLimit        int                    `json:"time_limit"`
+	Difficulty       float64                `json:"difficulty"`
+	HPConfig         map[string]interface{} `json:"hp_config,omitempty"`
+	GameMode         string                 `json:"game_mode"`
+	RecommendedModes []string               `json:"recommended_modes,omitempty"`
+	ModeConfig       map[string]interface{} `json:"mode_config,omitempty"`
+	Status           int                    `json:"status"`
+	SortOrder        int                    `json:"sort_order"`
 }
 
 // LevelDetailResponse 关卡详情响应

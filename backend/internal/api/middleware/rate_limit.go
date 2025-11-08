@@ -95,7 +95,7 @@ func RateLimitMiddleware() gin.HandlerFunc {
 		key := c.ClientIP()
 		
 		if !globalLimiter.allow(key) {
-			response.Error(c, 429, "请求过于频繁，请稍后再试", nil)
+			response.Error(c, 429, "请求过于频繁，请稍后再试")
 			c.Abort()
 			return
 		}
@@ -118,7 +118,7 @@ func RateLimitByUser(rate int, window time.Duration) gin.HandlerFunc {
 		key := string(rune(userID))
 		
 		if !limiter.allow(key) {
-			response.Error(c, 429, "请求过于频繁，请稍后再试", nil)
+			response.Error(c, 429, "请求过于频繁，请稍后再试")
 			c.Abort()
 			return
 		}

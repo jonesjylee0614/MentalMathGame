@@ -29,7 +29,7 @@ func (h *LevelHandler) GetLevels(c *gin.Context) {
 	
 	levels, err := h.levelService.GetLevels(category, status)
 	if err != nil {
-		response.InternalError(c, "获取关卡列表失败")
+		response.InternalServerError(c, "获取关卡列表失败")
 		return
 	}
 	

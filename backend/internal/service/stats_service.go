@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"errors"
 	"time"
 	
@@ -227,8 +226,7 @@ func (s *statsService) GetUserAchievements(userID uint64, completed *bool) ([]dt
 		}
 		
 		// 解析目标值
-		var conditionValue map[string]interface{}
-		json.Unmarshal(a.ConditionValue, &conditionValue)
+		conditionValue := map[string]interface{}(a.ConditionValue)
 		
 		if count, ok := conditionValue["count"].(float64); ok {
 			resp.Target = int(count)

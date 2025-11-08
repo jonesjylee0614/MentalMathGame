@@ -1,7 +1,6 @@
 package service
 
 import (
-	"encoding/json"
 	"errors"
 	"math"
 	"time"
@@ -58,7 +57,12 @@ func (s *gameService) SubmitGameResult(userID uint64, req *dto.SubmitGameRequest
 	// 使用事务处理所有更新
 	err = s.db.Transaction(func(tx *gorm.DB) error {
 		// 3. 保存游戏记录
-		answersJSON, _ := json.Marshal(req.AnswersHistory)
+		// 将[]AnswerRecord转换为JSONArray ([]interface{})
+		answersHistory := make(model.JSONArray, len(req.AnswersHistory))
+		for i, answer := range req.AnswersHistory {
+			answersHistory[i] = answer
+		}
+		
 		record := &model.GameRecord{
 			UserID:         userID,
 			LevelID:        req.LevelID,
@@ -70,7 +74,7 @@ func (s *gameService) SubmitGameResult(userID uint64, req *dto.SubmitGameRequest
 			TimeUsed:       req.TimeUsed,
 			TimeLeft:       req.TimeLeft,
 			Outcome:        req.Outcome,
-			AnswersHistory: answersJSON,
+			AnswersHistory: answersHistory,
 		}
 		
 		if err := tx.Create(record).Error; err != nil {
@@ -117,7 +121,8 @@ func (s *gameService) SubmitGameResult(userID uint64, req *dto.SubmitGameRequest
 		progress.TotalCorrect += req.CorrectCount
 		progress.TotalWrong += req.TotalQuestions - req.CorrectCount
 		progress.LastOutcome = req.Outcome
-		progress.LastPlayedAt = time.Now()
+		now := time.Now()
+		progress.LastPlayedAt = &now
 		
 		if err := s.gameRepo.UpsertLevelProgress(progress); err != nil {
 			return err
